@@ -411,7 +411,7 @@ Reference: Wedding Gift`}
                         <h6 className="font-medium text-yellow-900">Important Notes:</h6>
                         <ul className="mt-2 text-sm text-yellow-700 space-y-1">
                           <li>• Ensure your PayPal account can receive payments</li>
-                          <li>• Consider PayPal's transaction fees</li>
+                          <li>• Consider PayPal&apos;s transaction fees</li>
                           <li>• Test with a small amount before your wedding</li>
                           <li>• Keep your PayPal email secure</li>
                         </ul>
