@@ -512,8 +512,8 @@ function GuestModal({
                 <option value="Family">Family</option>
                 <option value="Friend">Friend</option>
                 <option value="Colleague">Colleague</option>
-                <option value="Partner's Family">Partner's Family</option>
-                <option value="Partner's Friend">Partner's Friend</option>
+                <option value="Partner's Family">Partner&apos;s Family</option>
+                <option value="Partner's Friend">Partner&apos;s Friend</option>
                 <option value="Other">Other</option>
               </select>
             </div>

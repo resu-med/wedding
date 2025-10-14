@@ -302,7 +302,7 @@ export default function PublicWeddingSite() {
             <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
               <Gift className="h-12 w-12 mx-auto mb-4" style={{ color: site.primaryColor }} />
               <p className="text-gray-700 mb-6">
-                Your presence is the only present we need, but if you'd like to contribute to our future together, we'd be grateful.
+                Your presence is the only present we need, but if you&apos;d like to contribute to our future together, we&apos;d be grateful.
               </p>
               <button
                 className="w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors mb-3"

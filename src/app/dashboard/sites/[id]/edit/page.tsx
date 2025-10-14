@@ -120,7 +120,7 @@ export default function EditWeddingDetails() {
     }
   }
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 

@@ -106,7 +106,7 @@ export default function GiftModal({
             </p>
             {formData.paymentMethod === 'PAYPAL' && (
               <p className="text-sm text-gray-500 mt-2">
-                If the PayPal window didn't open, please check your popup blocker.
+                If the PayPal window didn&apos;t open, please check your popup blocker.
               </p>
             )}
           </div>
@@ -158,7 +158,7 @@ export default function GiftModal({
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">Gift Type</h3>
-                <p className="text-gray-600">Choose how you'd like to contribute</p>
+                <p className="text-gray-600">Choose how you&apos;d like to contribute</p>
                 {giftMessage && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-700">{giftMessage}</p>

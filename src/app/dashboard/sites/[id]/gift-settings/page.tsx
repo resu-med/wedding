@@ -12,7 +12,8 @@ import {
   CreditCard,
   Building,
   Eye,
-  Download
+  Download,
+  BarChart3
 } from 'lucide-react'
 
 interface WeddingSite {
@@ -135,7 +136,7 @@ export default function GiftSettings() {
     }
   }
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
