@@ -1,0 +1,246 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  weddingSites  WeddingSite[]
+
+  @@map("users")
+}
+
+model WeddingSite {
+  id                String    @id @default(cuid())
+  subdomain         String    @unique
+  customDomain      String?   @unique
+
+  // Couple Information
+  partner1Name      String
+  partner2Name      String
+  partner1Email     String?
+  partner2Email     String?
+  weddingDate       DateTime
+  weddingTime       String?
+
+  // Venue Information
+  venueName         String
+  venueAddress      String
+  venueCity         String
+  venueState        String
+  venueZip          String
+  venueCountry      String
+
+  // Customization
+  primaryColor      String    @default("#d946ef")
+  secondaryColor    String    @default("#f3f4f6")
+  fontFamily        String    @default("Inter")
+  heroImage         String?
+  galleryImages     String[]
+
+  // Settings
+  rsvpEnabled       Boolean   @default(true)
+  rsvpDeadline      DateTime?
+  giftsEnabled      Boolean   @default(true)
+  accommodationEnabled Boolean @default(true)
+  transportEnabled  Boolean   @default(true)
+  guestListEnabled  Boolean   @default(true)
+
+  // Content
+  welcomeMessage    String?
+  aboutUsStory      String?
+  scheduleDetails   String?
+  accommodationInfo String?
+  transportInfo     String?
+  specialRequests   String?
+
+  // Payment Settings
+  paypalEmail       String?
+  bankDetails       String?
+  giftMessage       String?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relationships
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rsvps             Rsvp[]
+  guests            Guest[]
+  gifts             Gift[]
+  announcements     Announcement[]
+  timeline          TimelineEvent[]
+
+  @@map("wedding_sites")
+}
+
+model Guest {
+  id              String    @id @default(cuid())
+  name            String
+  email           String?
+  phone           String?
+  category        String?   // family, friends, work, etc.
+  inviteGroup     String?   // group guests together (families)
+  isMainGuest     Boolean   @default(true)
+
+  // RSVP Info
+  rsvpStatus      RsvpStatus @default(PENDING)
+  attendingCeremony Boolean?
+  attendingReception Boolean?
+  dietaryRequests String?
+  specialRequests String?
+  plusOneAllowed  Boolean   @default(false)
+  plusOneName     String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  weddingSiteId   String
+  weddingSite     WeddingSite @relation(fields: [weddingSiteId], references: [id], onDelete: Cascade)
+  rsvps           Rsvp[]
+
+  @@map("guests")
+}
+
+model Rsvp {
+  id                String    @id @default(cuid())
+  status            RsvpStatus
+  attendingCeremony Boolean
+  attendingReception Boolean
+  dietaryRequests   String?
+  specialRequests   String?
+  plusOneName       String?
+  plusOneEmail      String?
+  message           String?
+  submittedAt       DateTime  @default(now())
+
+  guestId           String
+  guest             Guest     @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  weddingSiteId     String
+  weddingSite       WeddingSite @relation(fields: [weddingSiteId], references: [id], onDelete: Cascade)
+
+  @@map("rsvps")
+}
+
+model Gift {
+  id                String      @id @default(cuid())
+  giftType          GiftType
+  amount            Decimal?
+  message           String?
+  giftDescription   String?
+
+  // Payment Info
+  paymentMethod     PaymentMethod
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentReference  String?
+
+  // Giver Info
+  giverName         String
+  giverEmail        String?
+  giverPhone        String?
+  anonymous         Boolean     @default(false)
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  weddingSiteId     String
+  weddingSite       WeddingSite @relation(fields: [weddingSiteId], references: [id], onDelete: Cascade)
+
+  @@map("gifts")
+}
+
+model Announcement {
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  priority      Priority  @default(NORMAL)
+  publishAt     DateTime  @default(now())
+  expiresAt     DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  weddingSiteId String
+  weddingSite   WeddingSite @relation(fields: [weddingSiteId], references: [id], onDelete: Cascade)
+
+  @@map("announcements")
+}
+
+model TimelineEvent {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  startTime     DateTime
+  endTime       DateTime?
+  location      String?
+  category      EventCategory @default(OTHER)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  weddingSiteId String
+  weddingSite   WeddingSite @relation(fields: [weddingSiteId], references: [id], onDelete: Cascade)
+
+  @@map("timeline_events")
+}
+
+enum RsvpStatus {
+  PENDING
+  ATTENDING
+  NOT_ATTENDING
+  MAYBE
+}
+
+enum GiftType {
+  MONETARY
+  REGISTRY_ITEM
+  EXPERIENCE
+  OTHER
+}
+
+enum PaymentMethod {
+  PAYPAL
+  BANK_TRANSFER
+  STRIPE
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum EventCategory {
+  CEREMONY
+  RECEPTION
+  REHEARSAL
+  PARTY
+  PHOTO_SESSION
+  TRANSPORTATION
+  OTHER
+}
