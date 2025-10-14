@@ -75,7 +75,6 @@ export default function VenueMap({ lat, lng, venueName, venueAddress, googleMaps
             </svg>
             View on OpenStreetMap
           </a>
-        </a>
       </div>
     </div>
   )
