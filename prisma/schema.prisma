@@ -70,6 +70,12 @@ model WeddingSite {
   transportInfo     String?
   specialRequests   String?
 
+  // Venue Location
+  venueAddress      String?
+  venueLat          Float?
+  venueLng          Float?
+  venueGoogleMapsUrl String?
+
   // Payment Settings
   paypalEmail       String?
   bankDetails       String?

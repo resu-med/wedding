@@ -12,7 +12,8 @@ import {
   Palette,
   Users,
   Heart,
-  Clock
+  Clock,
+  Search
 } from 'lucide-react'
 
 interface WeddingSite {
@@ -30,6 +31,9 @@ interface WeddingSite {
   venueState: string
   venueZip: string
   venueCountry: string
+  venueLat?: number
+  venueLng?: number
+  venueGoogleMapsUrl?: string
   primaryColor: string
   secondaryColor: string
   fontFamily: string
@@ -68,6 +72,36 @@ export default function EditWeddingDetails() {
   const [activeTab, setActiveTab] = useState('basic')
 
   const [formData, setFormData] = useState<Partial<WeddingSite>>({})
+  const [geocoding, setGeocoding] = useState(false)
+
+  const lookupVenueLocation = async () => {
+    if (!formData.venueAddress) {
+      alert('Please enter a venue address first')
+      return
+    }
+
+    setGeocoding(true)
+    try {
+      const fullAddress = `${formData.venueAddress}, ${formData.venueCity || ''}, ${formData.venueState || ''}, ${formData.venueCountry || ''}`.trim()
+
+      const response = await fetch(`/api/geocode?address=${encodeURIComponent(fullAddress)}`)
+      const data = await response.json()
+
+      if (response.ok) {
+        updateFormData('venueLat', data.lat)
+        updateFormData('venueLng', data.lng)
+        updateFormData('venueGoogleMapsUrl', data.googleMapsUrl)
+        alert('Location found successfully!')
+      } else {
+        alert(data.error || 'Location not found')
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error)
+      alert('Failed to lookup location')
+    } finally {
+      setGeocoding(false)
+    }
+  }
 
   useEffect(() => {
     if (!session || !siteId) {
@@ -294,12 +328,29 @@ export default function EditWeddingDetails() {
                     <label className="block text-sm font-medium text-gray-700">
                       Address *
                     </label>
-                    <input
-                      type="text"
-                      value={formData.venueAddress || ''}
-                      onChange={(e) => updateFormData('venueAddress', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    />
+                    <div className="mt-1 flex rounded-md shadow-sm">
+                      <input
+                        type="text"
+                        value={formData.venueAddress || ''}
+                        onChange={(e) => updateFormData('venueAddress', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                        placeholder="Enter venue address"
+                      />
+                      <button
+                        type="button"
+                        onClick={lookupVenueLocation}
+                        disabled={geocoding || !formData.venueAddress}
+                        className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Search className="h-4 w-4" />
+                        {geocoding ? 'Looking up...' : 'Lookup'}
+                      </button>
+                    </div>
+                    {formData.venueLat && formData.venueLng && (
+                      <p className="mt-1 text-sm text-green-600">
+                        ✓ Location found: {formData.venueLat.toFixed(4)}, {formData.venueLng.toFixed(4)}
+                      </p>
+                    )}
                   </div>
 
                   <div>

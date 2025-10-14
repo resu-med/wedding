@@ -6,6 +6,7 @@ import { Heart, Calendar, MapPin, Gift, Users, Camera, MessageCircle, Clock } fr
 import { formatDate, formatTime } from '@/lib/utils'
 import RSVPModal from '@/components/RSVPModal'
 import GiftModal from '@/components/GiftModal'
+import VenueMap from '@/components/VenueMap'
 
 interface WeddingSite {
   id: string
@@ -19,6 +20,9 @@ interface WeddingSite {
   venueCity: string
   venueState: string
   venueZip: string
+  venueLat?: number
+  venueLng?: number
+  venueGoogleMapsUrl?: string
   primaryColor: string
   secondaryColor: string
   welcomeMessage?: string
@@ -239,6 +243,22 @@ export default function PublicWeddingSite() {
           </div>
         </div>
       </section>
+
+      {/* Venue Map Section */}
+      {site.venueLat && site.venueLng && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Find Us</h2>
+            <VenueMap
+              lat={site.venueLat}
+              lng={site.venueLng}
+              venueName={site.venueName}
+              venueAddress={`${site.venueAddress}, ${site.venueCity}, ${site.venueState} ${site.venueZip}`}
+              googleMapsUrl={site.venueGoogleMapsUrl}
+            />
+          </div>
+        </section>
+      )}
 
       {/* RSVP Section */}
       {site.rsvpEnabled && (
