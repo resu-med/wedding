@@ -1,28 +1,24 @@
 # 🚀 Wedding Planning App - Vercel Deployment Guide
 
-## Step 1: Set Up Production Database (Neon)
-
-1. **Go to [neon.tech](https://neon.tech)**
-2. **Sign up/Login** and create a new project
-3. **Name your project**: `wedding-planning-app`
-4. **Copy the connection string** - it will look like:
-   ```
-   postgresql://username:password@ep-xxx.us-east-1.aws.neon.tech/neondb
-   ```
-
-## Step 2: Deploy to Vercel
+## Step 1: Deploy to Vercel (with Built-in Database)
 
 1. **Go to your Vercel dashboard**
 2. **Click "New Project"**
 3. **Import your GitHub repository**: `resu-med/wedding`
-4. **Set these Environment Variables** before deploying:
+4. **During setup, click "Storage" tab**
+5. **Click "Create Database" → "Postgres"**
+6. **Accept defaults and create database**
 
-### Required Environment Variables:
+### This will automatically set up:
+- ✅ **PostgreSQL database** hosted by Vercel
+- ✅ **DATABASE_URL** environment variable
+- ✅ **Connection pooling** and optimization
+
+## Step 2: Set Additional Environment Variables
+
+After creating the database, add these environment variables:
 
 ```bash
-# Database
-DATABASE_URL=postgresql://your-neon-connection-string-here
-
 # Authentication (IMPORTANT: Use the generated secret below)
 NEXTAUTH_SECRET=DhP/YmFDsYGJnMHjVGRTiEsF7VfFEVIBxNikOe9O+FA=
 NEXTAUTH_URL=https://your-app-name.vercel.app
@@ -32,33 +28,21 @@ NEXT_PUBLIC_PAYPAL_CLIENT_ID=your-paypal-client-id
 PAYPAL_CLIENT_SECRET=your-paypal-secret
 ```
 
-### How to Add Environment Variables in Vercel:
+### How to Add Environment Variables:
 1. In your project settings, go to "Environment Variables"
-2. Add each variable one by one:
-   - **Name**: `DATABASE_URL`
-   - **Value**: Your Neon connection string
+2. Add each variable:
    - **Environment**: All (Production, Preview, Development)
 
-## Step 3: Update NEXTAUTH_URL After Deployment
+## Step 3: Deploy & Update URL
 
-1. **After your first deployment**, copy your Vercel app URL
-2. **Update the `NEXTAUTH_URL` environment variable** with your actual domain:
-   ```
-   NEXTAUTH_URL=https://your-actual-app-name.vercel.app
-   ```
-3. **Redeploy** to apply the changes
+1. **Click "Deploy"**
+2. **After deployment**, copy your Vercel app URL
+3. **Update `NEXTAUTH_URL`** with your actual domain
+4. **Redeploy** to apply changes
 
-## Step 4: Initialize Database
+## Step 4: Database Initialization
 
-After deployment, you'll need to run the database migrations:
-
-1. **Go to your Vercel project dashboard**
-2. **Go to Functions tab**
-3. **Or run locally then deploy**:
-   ```bash
-   # Update your local .env with production DATABASE_URL
-   npx prisma db push
-   ```
+The database will be automatically initialized on first deployment thanks to the `prisma generate` in our build script!
 
 ## 🎉 Your App Will Include:
 
