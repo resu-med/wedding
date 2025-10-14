@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe } from 'lucide-react'
+import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe, Search } from 'lucide-react'
 import { generateSubdomain, isValidSubdomain } from '@/lib/utils'
 
 export default function CreateWeddingSite() {
@@ -12,6 +12,7 @@ export default function CreateWeddingSite() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [geocoding, setGeocoding] = useState(false)
 
   const [formData, setFormData] = useState({
     partner1Name: '',
@@ -26,6 +27,9 @@ export default function CreateWeddingSite() {
     venueState: '',
     venueZip: '',
     venueCountry: 'United States',
+    venueLat: null as number | null,
+    venueLng: null as number | null,
+    venueGoogleMapsUrl: '',
     subdomain: '',
     primaryColor: '#d946ef',
     secondaryColor: '#f3f4f6',
@@ -47,6 +51,38 @@ export default function CreateWeddingSite() {
 
       return updated
     })
+  }
+
+  const lookupVenueLocation = async () => {
+    if (!formData.venueAddress) {
+      alert('Please enter a venue address first')
+      return
+    }
+
+    setGeocoding(true)
+    try {
+      const fullAddress = `${formData.venueAddress}, ${formData.venueCity || ''}, ${formData.venueState || ''}, ${formData.venueCountry || ''}`.trim()
+
+      const response = await fetch(`/api/geocode?address=${encodeURIComponent(fullAddress)}`)
+      const data = await response.json()
+
+      if (response.ok) {
+        setFormData(prev => ({
+          ...prev,
+          venueLat: data.lat,
+          venueLng: data.lng,
+          venueGoogleMapsUrl: data.googleMapsUrl
+        }))
+        alert('Location found successfully!')
+      } else {
+        alert(data.error || 'Failed to lookup location')
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error)
+      alert('Failed to lookup location')
+    } finally {
+      setGeocoding(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -303,6 +339,38 @@ export default function CreateWeddingSite() {
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
                   />
                 </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Venue Location</h3>
+                  <button
+                    type="button"
+                    onClick={lookupVenueLocation}
+                    disabled={geocoding || !formData.venueAddress}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    {geocoding ? 'Looking up...' : 'Lookup Location'}
+                  </button>
+                </div>
+
+                {formData.venueLat && formData.venueLng ? (
+                  <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                    <p className="text-sm text-green-700">
+                      ✓ Location found: {formData.venueLat.toFixed(6)}, {formData.venueLng.toFixed(6)}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      This will allow guests to see the venue location on a map
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+                    <p className="text-sm text-gray-600">
+                      Enter the venue address above and click &quot;Lookup Location&quot; to enable map features for your guests
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
