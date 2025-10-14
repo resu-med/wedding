@@ -71,7 +71,6 @@ model WeddingSite {
   specialRequests   String?
 
   // Venue Location
-  venueAddress      String?
   venueLat          Float?
   venueLng          Float?
   venueGoogleMapsUrl String?
