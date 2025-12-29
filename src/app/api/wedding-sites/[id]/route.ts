@@ -136,7 +136,13 @@ export async function PUT(
         rsvpDeadline: data.rsvpDeadline ? new Date(data.rsvpDeadline) : weddingSite.rsvpDeadline,
         paypalEmail: data.paypalEmail !== undefined ? data.paypalEmail : weddingSite.paypalEmail,
         bankDetails: data.bankDetails !== undefined ? data.bankDetails : weddingSite.bankDetails,
+        bankName: data.bankName !== undefined ? data.bankName : weddingSite.bankName,
+        bankAccountName: data.bankAccountName !== undefined ? data.bankAccountName : weddingSite.bankAccountName,
+        bankIban: data.bankIban !== undefined ? data.bankIban : weddingSite.bankIban,
+        bankBic: data.bankBic !== undefined ? data.bankBic : weddingSite.bankBic,
+        bankReference: data.bankReference !== undefined ? data.bankReference : weddingSite.bankReference,
         giftMessage: data.giftMessage !== undefined ? data.giftMessage : weddingSite.giftMessage,
+        giftCurrency: data.giftCurrency !== undefined ? data.giftCurrency : weddingSite.giftCurrency,
       }
     })
 
