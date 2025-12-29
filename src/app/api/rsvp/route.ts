@@ -2,12 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEmail, formatRSVPEmail } from '@/lib/email'
 
+interface GuestInput {
+  name: string
+  dietaryRequests?: string
+  isMainGuest: boolean
+}
+
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
 
+    // Handle both old single-guest format and new multi-guest format
+    const guests: GuestInput[] = data.guests || [{
+      name: data.name,
+      dietaryRequests: data.dietaryRequests,
+      isMainGuest: true
+    }]
+
     // Validate required fields
-    if (!data.name || !data.email || !data.rsvpStatus || !data.siteId) {
+    const mainGuest = guests.find(g => g.isMainGuest) || guests[0]
+    if (!mainGuest?.name || !data.email || !data.rsvpStatus || !data.siteId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -41,87 +55,124 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create or find guest
-    let guest = await prisma.guest.findFirst({
-      where: {
-        email: data.email,
-        weddingSiteId: data.siteId
-      }
-    })
+    // Generate a group ID for this RSVP submission
+    const groupId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-    if (!guest) {
-      guest = await prisma.guest.create({
+    const createdGuests = []
+    const createdRsvps = []
+
+    // Create guests and RSVPs for each person in the party
+    for (let i = 0; i < guests.length; i++) {
+      const guestData = guests[i]
+      const isMain = guestData.isMainGuest || i === 0
+
+      // Check if this guest already exists (by email for main guest, or by name + site)
+      let guest = null
+
+      if (isMain) {
+        // For main guest, check by email
+        guest = await prisma.guest.findFirst({
+          where: {
+            email: data.email,
+            weddingSiteId: data.siteId
+          }
+        })
+      }
+
+      if (!guest) {
+        // Create new guest
+        guest = await prisma.guest.create({
+          data: {
+            name: guestData.name,
+            email: isMain ? data.email : null,
+            phone: isMain ? (data.phone || null) : null,
+            rsvpStatus: data.rsvpStatus,
+            attendingCeremony: data.attendingCeremony,
+            attendingReception: data.attendingReception,
+            dietaryRequests: guestData.dietaryRequests || null,
+            specialRequests: isMain ? (data.specialRequests || null) : null,
+            isMainGuest: isMain,
+            inviteGroup: groupId,
+            weddingSiteId: data.siteId
+          }
+        })
+      } else {
+        // Update existing guest
+        guest = await prisma.guest.update({
+          where: { id: guest.id },
+          data: {
+            name: guestData.name,
+            phone: data.phone || guest.phone,
+            rsvpStatus: data.rsvpStatus,
+            attendingCeremony: data.attendingCeremony,
+            attendingReception: data.attendingReception,
+            dietaryRequests: guestData.dietaryRequests || guest.dietaryRequests,
+            specialRequests: data.specialRequests || guest.specialRequests,
+            inviteGroup: groupId
+          }
+        })
+      }
+
+      createdGuests.push(guest)
+
+      // Create RSVP record
+      const rsvp = await prisma.rsvp.create({
         data: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone || null,
-          rsvpStatus: data.rsvpStatus,
-          attendingCeremony: data.attendingCeremony,
-          attendingReception: data.attendingReception,
-          dietaryRequests: data.dietaryRequests || null,
-          specialRequests: data.specialRequests || null,
-          plusOneName: data.plusOneName || null,
+          status: data.rsvpStatus,
+          attendingCeremony: data.attendingCeremony || false,
+          attendingReception: data.attendingReception || false,
+          dietaryRequests: guestData.dietaryRequests || null,
+          specialRequests: isMain ? (data.specialRequests || null) : null,
+          message: isMain ? (data.message || null) : null,
+          guestId: guest.id,
           weddingSiteId: data.siteId
         }
       })
-    } else {
-      // Update existing guest
-      guest = await prisma.guest.update({
-        where: { id: guest.id },
-        data: {
-          name: data.name,
-          phone: data.phone || guest.phone,
-          rsvpStatus: data.rsvpStatus,
-          attendingCeremony: data.attendingCeremony,
-          attendingReception: data.attendingReception,
-          dietaryRequests: data.dietaryRequests || guest.dietaryRequests,
-          specialRequests: data.specialRequests || guest.specialRequests,
-          plusOneName: data.plusOneName || guest.plusOneName
-        }
-      })
-    }
 
-    // Create RSVP record
-    const rsvp = await prisma.rsvp.create({
-      data: {
-        status: data.rsvpStatus,
-        attendingCeremony: data.attendingCeremony || false,
-        attendingReception: data.attendingReception || false,
-        dietaryRequests: data.dietaryRequests || null,
-        specialRequests: data.specialRequests || null,
-        plusOneName: data.plusOneName || null,
-        plusOneEmail: data.plusOneEmail || null,
-        message: data.message || null,
-        guestId: guest.id,
-        weddingSiteId: data.siteId
-      }
-    })
+      createdRsvps.push(rsvp)
+    }
 
     // Send email notification to partner1
     if (weddingSite.partner1Email) {
+      const guestNames = guests.map(g => g.name).join(', ')
+      const dietaryList = guests
+        .filter(g => g.dietaryRequests)
+        .map(g => `${g.name}: ${g.dietaryRequests}`)
+        .join('\n')
+
       const emailHtml = formatRSVPEmail({
-        guestName: data.name,
+        guestName: guestNames,
         guestEmail: data.email,
         rsvpStatus: data.rsvpStatus,
         attendingCeremony: data.attendingCeremony || false,
         attendingReception: data.attendingReception || false,
-        dietaryRequests: data.dietaryRequests,
+        dietaryRequests: dietaryList || undefined,
         specialRequests: data.specialRequests,
-        plusOneName: data.plusOneName,
         message: data.message,
         partner1Name: weddingSite.partner1Name,
         partner2Name: weddingSite.partner2Name,
+        partySize: guests.length
       })
+
+      const statusText = data.rsvpStatus === 'ATTENDING'
+        ? 'attending'
+        : data.rsvpStatus === 'NOT_ATTENDING'
+        ? 'not attending'
+        : 'undecided'
 
       // Send email in the background (don't block response)
       sendEmail({
         to: weddingSite.partner1Email,
-        subject: `New RSVP: ${data.name} is ${data.rsvpStatus === 'ATTENDING' ? 'attending' : data.rsvpStatus === 'NOT_ATTENDING' ? 'not attending' : 'undecided'}`,
+        subject: `New RSVP: ${mainGuest.name}${guests.length > 1 ? ` + ${guests.length - 1} guest${guests.length > 2 ? 's' : ''}` : ''} ${statusText}`,
         html: emailHtml,
       }).catch(err => console.error('Failed to send RSVP email:', err))
     }
 
-    return NextResponse.json({ rsvp, guest }, { status: 201 })
+    return NextResponse.json({
+      rsvps: createdRsvps,
+      guests: createdGuests,
+      groupId
+    }, { status: 201 })
   } catch (error) {
     console.error('Error creating RSVP:', error)
     return NextResponse.json(

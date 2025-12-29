@@ -58,6 +58,7 @@ export function formatRSVPEmail({
   message,
   partner1Name,
   partner2Name,
+  partySize = 1,
 }: {
   guestName: string
   guestEmail: string
@@ -70,6 +71,7 @@ export function formatRSVPEmail({
   message?: string | null
   partner1Name: string
   partner2Name: string
+  partySize?: number
 }) {
   const statusText = rsvpStatus === 'ATTENDING' ? 'Attending' :
                      rsvpStatus === 'NOT_ATTENDING' ? 'Not Attending' : 'Maybe'
@@ -98,7 +100,11 @@ export function formatRSVPEmail({
             <h2 style="color: #111827; font-size: 18px; margin: 0 0 12px 0;">Guest Details</h2>
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
-                <td style="padding: 8px 0; color: #6b7280; width: 140px;">Name:</td>
+                <td style="padding: 8px 0; color: #6b7280; width: 140px;">Party Size:</td>
+                <td style="padding: 8px 0; color: #111827; font-weight: 500;">${partySize} ${partySize === 1 ? 'guest' : 'guests'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280; width: 140px;">${partySize > 1 ? 'Guests:' : 'Name:'}</td>
                 <td style="padding: 8px 0; color: #111827; font-weight: 500;">${guestName}</td>
               </tr>
               <tr>
