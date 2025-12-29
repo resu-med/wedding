@@ -41,6 +41,7 @@ export async function GET(
         aboutUsStory: true,
         scheduleDetails: true,
         accommodationInfo: true,
+        accommodationPlaces: true,
         transportInfo: true,
         specialRequests: true,
         paypalEmail: true,

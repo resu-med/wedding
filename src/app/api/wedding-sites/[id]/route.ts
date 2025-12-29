@@ -125,6 +125,7 @@ export async function PUT(
         welcomeMessage: data.welcomeMessage !== undefined ? data.welcomeMessage : weddingSite.welcomeMessage,
         aboutUsStory: data.aboutUsStory !== undefined ? data.aboutUsStory : weddingSite.aboutUsStory,
         accommodationInfo: data.accommodationInfo !== undefined ? data.accommodationInfo : weddingSite.accommodationInfo,
+        accommodationPlaces: data.accommodationPlaces !== undefined ? data.accommodationPlaces : weddingSite.accommodationPlaces,
         transportInfo: data.transportInfo !== undefined ? data.transportInfo : weddingSite.transportInfo,
         scheduleDetails: data.scheduleDetails !== undefined ? data.scheduleDetails : weddingSite.scheduleDetails,
         specialRequests: data.specialRequests !== undefined ? data.specialRequests : weddingSite.specialRequests,

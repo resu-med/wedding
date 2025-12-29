@@ -248,15 +248,26 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
             ]}
           />
 
+          {/* Accommodation */}
+          <ManagementCard
+            title="Accommodation"
+            description="Add recommended hotels and places to stay for your guests"
+            icon={<MapPin className="h-8 w-8 text-teal-500" />}
+            actions={[
+              { label: "Manage Stays", href: `/dashboard/sites/${siteId}/accommodation`, primary: true },
+              { label: "Edit Info", href: `/dashboard/sites/${siteId}/edit?tab=content` }
+            ]}
+          />
+
           {/* Site Customization */}
           <ManagementCard
             title="Site Customization"
             description="Customize your website appearance, upload photos, and manage content"
             icon={<Camera className="h-8 w-8 text-purple-500" />}
             actions={[
-              { label: "Customize Design", href: "#", primary: true },
+              { label: "Edit Design", href: `/dashboard/sites/${siteId}/edit?tab=settings`, primary: true },
               { label: "Photo Gallery", href: `/dashboard/sites/${siteId}/gallery` },
-              { label: "Content Editor", href: "#" }
+              { label: "Content Editor", href: `/dashboard/sites/${siteId}/edit?tab=content` }
             ]}
           />
 
