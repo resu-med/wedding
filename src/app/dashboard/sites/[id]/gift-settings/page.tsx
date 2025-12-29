@@ -299,17 +299,22 @@ export default function GiftSettings() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700">
-                            PayPal Email Address
+                            PayPal.me Username
                           </label>
-                          <input
-                            type="email"
-                            value={formData.paypalEmail}
-                            onChange={(e) => updateFormData('paypalEmail', e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                            placeholder="your-paypal@email.com"
-                          />
+                          <div className="mt-1 flex rounded-md shadow-sm">
+                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                              paypal.me/
+                            </span>
+                            <input
+                              type="text"
+                              value={formData.paypalEmail}
+                              onChange={(e) => updateFormData('paypalEmail', e.target.value)}
+                              className="flex-1 block w-full px-3 py-2 border border-gray-300 rounded-r-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                              placeholder="YourUsername"
+                            />
+                          </div>
                           <p className="mt-1 text-sm text-gray-500">
-                            Guests will be able to send gifts via PayPal to this email address.
+                            Enter your PayPal.me username. <a href="https://www.paypal.com/paypalme/" target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline">Create one here</a> if you don&apos;t have one.
                           </p>
                         </div>
                       </div>

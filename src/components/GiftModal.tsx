@@ -69,9 +69,15 @@ export default function GiftModal({
       if (response.ok) {
         const data = await response.json()
 
-        // If PayPal, redirect to PayPal
+        // If PayPal, redirect to PayPal.me
         if (formData.paymentMethod === 'PAYPAL' && paypalEmail) {
-          const paypalUrl = `https://www.paypal.com/paypalme/${paypalEmail.replace('@', '')}/${formData.amount}`
+          // paypalEmail can be either a PayPal.me username or a full PayPal.me URL
+          let paypalUsername = paypalEmail.trim()
+          // Remove common URL prefixes if user entered full URL
+          paypalUsername = paypalUsername.replace(/^https?:\/\/(www\.)?paypal\.(me|com\/paypalme)\//i, '')
+          // Remove any trailing slashes
+          paypalUsername = paypalUsername.replace(/\/+$/, '')
+          const paypalUrl = `https://paypal.me/${paypalUsername}/${formData.amount}`
           window.open(paypalUrl, '_blank')
         }
 
