@@ -7,6 +7,7 @@ import { formatDate, formatTime } from '@/lib/utils'
 import RSVPModal from '@/components/RSVPModal'
 import GiftModal from '@/components/GiftModal'
 import VenueMap from '@/components/VenueMap'
+import VenuePhotoCarousel from '@/components/VenuePhotoCarousel'
 
 interface WeddingSite {
   id: string
@@ -272,32 +273,15 @@ export default function PublicWeddingSite() {
         </div>
       </section>
 
-      {/* Venue Photos Section */}
+      {/* Venue Photos Carousel */}
       {site.venuePhotos && site.venuePhotos.length > 0 && (
-        <section className="py-16 bg-white/50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">The Venue</h2>
-            <p className="text-center text-gray-600 mb-8">{site.venueName}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {site.venuePhotos.slice(0, 6).map((photo, index) => (
-                <div
-                  key={index}
-                  className={`relative overflow-hidden rounded-lg shadow-lg ${
-                    index === 0 ? 'md:col-span-2 md:row-span-2' : ''
-                  }`}
-                  style={{ minHeight: index === 0 ? '400px' : '200px' }}
-                >
-                  <img
-                    src={photo}
-                    alt={`${site.venueName} - Photo ${index + 1}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    style={{ minHeight: 'inherit' }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <div className="bg-white/50">
+          <VenuePhotoCarousel
+            photos={site.venuePhotos}
+            venueName={site.venueName}
+            primaryColor={site.primaryColor}
+          />
+        </div>
       )}
 
       {/* Venue Map Section */}
