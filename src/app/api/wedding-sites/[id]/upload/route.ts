@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { v4 as uuidv4 } from 'uuid'
+import { put } from '@vercel/blob'
 
 export async function POST(
   request: NextRequest,
@@ -72,22 +70,13 @@ export async function POST(
       )
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', resolvedParams.id)
-    await mkdir(uploadsDir, { recursive: true })
+    // Upload to Vercel Blob
+    const filename = `${resolvedParams.id}/${type}/${Date.now()}-${file.name}`
+    const blob = await put(filename, file, {
+      access: 'public',
+    })
 
-    // Generate unique filename
-    const extension = file.name.split('.').pop()
-    const filename = `${uuidv4()}.${extension}`
-    const filepath = join(uploadsDir, filename)
-
-    // Write file
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
-
-    // Create public URL
-    const imageUrl = `/uploads/${resolvedParams.id}/${filename}`
+    const imageUrl = blob.url
 
     // Update database based on type
     if (type === 'hero') {
