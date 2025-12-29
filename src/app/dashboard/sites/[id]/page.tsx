@@ -167,10 +167,13 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
               </div>
             </div>
             <div className="flex space-x-3">
-              <button className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 flex items-center space-x-2">
+              <Link
+                href={`/dashboard/sites/${siteId}/edit`}
+                className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 flex items-center space-x-2"
+              >
                 <Edit className="h-4 w-4" />
                 <span>Edit Details</span>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
