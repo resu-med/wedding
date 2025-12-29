@@ -82,7 +82,13 @@ export default function EditWeddingDetails() {
 
     setGeocoding(true)
     try {
-      const fullAddress = `${formData.venueAddress}, ${formData.venueCity || ''}, ${formData.venueState || ''}, ${formData.venueCountry || ''}`.trim()
+      const fullAddress = [
+        formData.venueAddress,
+        formData.venueCity,
+        formData.venueState,
+        formData.venueZip,
+        formData.venueCountry
+      ].filter(Boolean).join(', ')
 
       const response = await fetch(`/api/geocode?address=${encodeURIComponent(fullAddress)}`)
       const data = await response.json()
@@ -393,12 +399,39 @@ export default function EditWeddingDetails() {
                     <label className="block text-sm font-medium text-gray-700">
                       Country *
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.venueCountry || ''}
                       onChange={(e) => updateFormData('venueCountry', e.target.value)}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    />
+                    >
+                      <option value="">Select a country</option>
+                      <option value="Spain">Spain</option>
+                      <option value="United States">United States</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Australia">Australia</option>
+                      <option value="France">France</option>
+                      <option value="Germany">Germany</option>
+                      <option value="Italy">Italy</option>
+                      <option value="Portugal">Portugal</option>
+                      <option value="Mexico">Mexico</option>
+                      <option value="Ireland">Ireland</option>
+                      <option value="Netherlands">Netherlands</option>
+                      <option value="Belgium">Belgium</option>
+                      <option value="Switzerland">Switzerland</option>
+                      <option value="Austria">Austria</option>
+                      <option value="Greece">Greece</option>
+                      <option value="New Zealand">New Zealand</option>
+                      <option value="Brazil">Brazil</option>
+                      <option value="Argentina">Argentina</option>
+                      <option value="India">India</option>
+                      <option value="Japan">Japan</option>
+                      <option value="South Korea">South Korea</option>
+                      <option value="Singapore">Singapore</option>
+                      <option value="Thailand">Thailand</option>
+                      <option value="Philippines">Philippines</option>
+                      <option value="South Africa">South Africa</option>
+                    </select>
                   </div>
                 </div>
               </div>
