@@ -77,7 +77,12 @@ model WeddingSite {
 
   // Payment Settings
   paypalEmail       String?
-  bankDetails       String?
+  bankDetails       String?   // Legacy field, kept for backwards compatibility
+  bankName          String?
+  bankAccountName   String?
+  bankIban          String?
+  bankBic           String?
+  bankReference     String?
   giftMessage       String?
   giftCurrency      String    @default("USD")
 

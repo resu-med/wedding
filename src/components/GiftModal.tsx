@@ -14,6 +14,11 @@ interface GiftModalProps {
   paypalEmail?: string
   giftMessage?: string
   giftCurrency?: string
+  bankName?: string
+  bankAccountName?: string
+  bankIban?: string
+  bankBic?: string
+  bankReference?: string
 }
 
 export default function GiftModal({
@@ -25,9 +30,15 @@ export default function GiftModal({
   partner2Name,
   paypalEmail,
   giftMessage,
-  giftCurrency = 'USD'
+  giftCurrency = 'USD',
+  bankName,
+  bankAccountName,
+  bankIban,
+  bankBic,
+  bankReference
 }: GiftModalProps) {
   const currencySymbol = getCurrencySymbol(giftCurrency)
+  const hasBankDetails = bankName || bankIban
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -297,29 +308,73 @@ export default function GiftModal({
                         </label>
                       )}
 
-                      <label
-                        className={`flex items-center border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                          formData.paymentMethod === 'BANK_TRANSFER'
-                            ? 'border-opacity-100'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        style={{ borderColor: formData.paymentMethod === 'BANK_TRANSFER' ? primaryColor : undefined }}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="BANK_TRANSFER"
-                          checked={formData.paymentMethod === 'BANK_TRANSFER'}
-                          onChange={handleChange}
-                          className="sr-only"
-                        />
-                        <Building className="h-6 w-6 mr-3" style={{ color: primaryColor }} />
-                        <div>
-                          <h4 className="font-semibold">Bank Transfer</h4>
-                          <p className="text-sm text-gray-600">Direct bank transfer details will be provided</p>
-                        </div>
-                      </label>
+                      {hasBankDetails && (
+                        <label
+                          className={`flex items-center border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                            formData.paymentMethod === 'BANK_TRANSFER'
+                              ? 'border-opacity-100'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          style={{ borderColor: formData.paymentMethod === 'BANK_TRANSFER' ? primaryColor : undefined }}
+                        >
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="BANK_TRANSFER"
+                            checked={formData.paymentMethod === 'BANK_TRANSFER'}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <Building className="h-6 w-6 mr-3" style={{ color: primaryColor }} />
+                          <div>
+                            <h4 className="font-semibold">Bank Transfer</h4>
+                            <p className="text-sm text-gray-600">Free - No fees for you or the couple</p>
+                          </div>
+                        </label>
+                      )}
                     </div>
+
+                    {/* Bank Details Display */}
+                    {formData.paymentMethod === 'BANK_TRANSFER' && hasBankDetails && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h5 className="font-semibold text-gray-900 mb-3">Bank Transfer Details</h5>
+                        <div className="space-y-2 text-sm">
+                          {bankName && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Bank:</span>
+                              <span className="font-medium text-gray-900">{bankName}</span>
+                            </div>
+                          )}
+                          {bankAccountName && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Account Name:</span>
+                              <span className="font-medium text-gray-900">{bankAccountName}</span>
+                            </div>
+                          )}
+                          {bankIban && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">IBAN:</span>
+                              <span className="font-medium text-gray-900 font-mono text-xs">{bankIban}</span>
+                            </div>
+                          )}
+                          {bankBic && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">BIC/SWIFT:</span>
+                              <span className="font-medium text-gray-900 font-mono">{bankBic}</span>
+                            </div>
+                          )}
+                          {bankReference && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Reference:</span>
+                              <span className="font-medium text-gray-900">{bankReference}</span>
+                            </div>
+                          )}
+                        </div>
+                        <p className="mt-3 text-xs text-gray-500">
+                          Please include the reference when making your transfer so we can identify your gift.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </>
               )}

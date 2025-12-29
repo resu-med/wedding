@@ -45,6 +45,11 @@ interface WeddingSite {
   specialRequests?: string
   paypalEmail?: string
   bankDetails?: string
+  bankName?: string
+  bankAccountName?: string
+  bankIban?: string
+  bankBic?: string
+  bankReference?: string
   giftMessage?: string
   giftCurrency?: string
   createdAt: string
@@ -395,6 +400,11 @@ export default function PublicWeddingSite() {
           paypalEmail={site.paypalEmail}
           giftMessage={site.giftMessage}
           giftCurrency={site.giftCurrency}
+          bankName={site.bankName}
+          bankAccountName={site.bankAccountName}
+          bankIban={site.bankIban}
+          bankBic={site.bankBic}
+          bankReference={site.bankReference}
         />
       )}
     </div>

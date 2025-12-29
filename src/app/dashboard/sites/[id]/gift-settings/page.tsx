@@ -23,6 +23,11 @@ interface WeddingSite {
   giftsEnabled: boolean
   paypalEmail?: string
   bankDetails?: string
+  bankName?: string
+  bankAccountName?: string
+  bankIban?: string
+  bankBic?: string
+  bankReference?: string
   giftMessage?: string
   giftCurrency: string
 }
@@ -68,7 +73,11 @@ export default function GiftSettings() {
   const [formData, setFormData] = useState({
     giftsEnabled: false,
     paypalEmail: '',
-    bankDetails: '',
+    bankName: '',
+    bankAccountName: '',
+    bankIban: '',
+    bankBic: '',
+    bankReference: '',
     giftMessage: '',
     giftCurrency: 'EUR'
   })
@@ -97,7 +106,11 @@ export default function GiftSettings() {
         setFormData({
           giftsEnabled: siteData.giftsEnabled || false,
           paypalEmail: siteData.paypalEmail || '',
-          bankDetails: siteData.bankDetails || '',
+          bankName: siteData.bankName || '',
+          bankAccountName: siteData.bankAccountName || '',
+          bankIban: siteData.bankIban || '',
+          bankBic: siteData.bankBic || '',
+          bankReference: siteData.bankReference || '',
           giftMessage: siteData.giftMessage || '',
           giftCurrency: siteData.giftCurrency || 'EUR'
         })
@@ -361,24 +374,70 @@ export default function GiftSettings() {
                           <Building className="h-5 w-5 text-green-500" />
                           <h4 className="text-md font-medium text-gray-900">Bank Transfer Details</h4>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Bank Account Details
-                          </label>
-                          <textarea
-                            rows={4}
-                            value={formData.bankDetails}
-                            onChange={(e) => updateFormData('bankDetails', e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                            placeholder={`Bank Name: Your Bank
-Account Name: Your Name
-Account Number: 123456789
-Sort Code: 12-34-56
-Reference: Wedding Gift`}
-                          />
-                          <p className="mt-1 text-sm text-gray-500">
-                            Provide your bank details for guests who prefer bank transfers.
-                          </p>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Bank Name
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.bankName}
+                              onChange={(e) => updateFormData('bankName', e.target.value)}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                              placeholder="e.g., Santander, BBVA, CaixaBank"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Account Holder Name
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.bankAccountName}
+                              onChange={(e) => updateFormData('bankAccountName', e.target.value)}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                              placeholder="Full name on the account"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              IBAN
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.bankIban}
+                              onChange={(e) => updateFormData('bankIban', e.target.value)}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black font-mono"
+                              placeholder="ES91 2100 0418 4502 0005 1332"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              BIC/SWIFT Code
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.bankBic}
+                              onChange={(e) => updateFormData('bankBic', e.target.value)}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black font-mono"
+                              placeholder="e.g., CAIXESBBXXX"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Payment Reference
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.bankReference}
+                              onChange={(e) => updateFormData('bankReference', e.target.value)}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                              placeholder="e.g., Wedding Gift - [Guest Name]"
+                            />
+                            <p className="mt-1 text-sm text-gray-500">
+                              Suggested reference for guests to use when making transfers.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
