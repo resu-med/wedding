@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendEmail, formatGiftEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,6 +70,28 @@ export async function POST(request: NextRequest) {
         weddingSiteId: data.siteId
       }
     })
+
+    // Send email notification to partner1
+    if (weddingSite.partner1Email && data.amount) {
+      const emailHtml = formatGiftEmail({
+        giverName: data.anonymous ? 'Anonymous' : data.giverName,
+        giverEmail: data.anonymous ? null : data.giverEmail,
+        amount: parseFloat(data.amount),
+        currency: weddingSite.giftCurrency || 'USD',
+        paymentMethod: data.paymentMethod,
+        message: data.message,
+        anonymous: data.anonymous || false,
+        partner1Name: weddingSite.partner1Name,
+        partner2Name: weddingSite.partner2Name,
+      })
+
+      // Send email in the background (don't block response)
+      sendEmail({
+        to: weddingSite.partner1Email,
+        subject: `New Gift Received: ${weddingSite.giftCurrency || 'USD'} ${parseFloat(data.amount).toFixed(2)}`,
+        html: emailHtml,
+      }).catch(err => console.error('Failed to send gift email:', err))
+    }
 
     return NextResponse.json({ gift }, { status: 201 })
   } catch (error) {

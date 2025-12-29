@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendEmail, formatRSVPEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -95,6 +96,30 @@ export async function POST(request: NextRequest) {
         weddingSiteId: data.siteId
       }
     })
+
+    // Send email notification to partner1
+    if (weddingSite.partner1Email) {
+      const emailHtml = formatRSVPEmail({
+        guestName: data.name,
+        guestEmail: data.email,
+        rsvpStatus: data.rsvpStatus,
+        attendingCeremony: data.attendingCeremony || false,
+        attendingReception: data.attendingReception || false,
+        dietaryRequests: data.dietaryRequests,
+        specialRequests: data.specialRequests,
+        plusOneName: data.plusOneName,
+        message: data.message,
+        partner1Name: weddingSite.partner1Name,
+        partner2Name: weddingSite.partner2Name,
+      })
+
+      // Send email in the background (don't block response)
+      sendEmail({
+        to: weddingSite.partner1Email,
+        subject: `New RSVP: ${data.name} is ${data.rsvpStatus === 'ATTENDING' ? 'attending' : data.rsvpStatus === 'NOT_ATTENDING' ? 'not attending' : 'undecided'}`,
+        html: emailHtml,
+      }).catch(err => console.error('Failed to send RSVP email:', err))
+    }
 
     return NextResponse.json({ rsvp, guest }, { status: 201 })
   } catch (error) {
