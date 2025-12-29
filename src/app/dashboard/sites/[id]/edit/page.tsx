@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -64,6 +64,7 @@ export default function EditWeddingDetails() {
   const { data: session } = useSession()
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
   const [siteId, setSiteId] = useState<string>('')
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function EditWeddingDetails() {
   const [site, setSite] = useState<WeddingSite | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState('basic')
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'basic')
 
   const [formData, setFormData] = useState<Partial<WeddingSite>>({})
   const [geocoding, setGeocoding] = useState(false)

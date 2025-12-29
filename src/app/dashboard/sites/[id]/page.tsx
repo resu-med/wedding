@@ -231,8 +231,8 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
             icon={<Calendar className="h-8 w-8 text-pink-500" />}
             actions={[
               { label: "Edit Wedding Info", href: `/dashboard/sites/${siteId}/edit`, primary: true },
-              { label: "Timeline", href: "#" },
-              { label: "Venue Details", href: "#" }
+              { label: "Venue Details", href: `/dashboard/sites/${siteId}/edit?tab=venue` },
+              { label: "Content", href: `/dashboard/sites/${siteId}/edit?tab=content` }
             ]}
           />
 
