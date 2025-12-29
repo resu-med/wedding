@@ -59,6 +59,9 @@ export default function AccommodationManagement() {
   const [accommodationInfo, setAccommodationInfo] = useState('')
   const [searchRadius, setSearchRadius] = useState('5000')
   const [showAddManual, setShowAddManual] = useState(false)
+  const [searchLocation, setSearchLocation] = useState('')
+  const [searchCoords, setSearchCoords] = useState<{ lat: number; lng: number; name: string } | null>(null)
+  const [searchingLocation, setSearchingLocation] = useState(false)
   const [manualHotel, setManualHotel] = useState({
     name: '',
     address: '',
@@ -99,16 +102,53 @@ export default function AccommodationManagement() {
     }
   }
 
+  const searchForLocation = async () => {
+    if (!searchLocation.trim()) {
+      alert('Please enter a location to search')
+      return
+    }
+
+    setSearchingLocation(true)
+    try {
+      const response = await fetch(`/api/geocode?address=${encodeURIComponent(searchLocation)}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.lat && data.lng) {
+          setSearchCoords({ lat: data.lat, lng: data.lng, name: searchLocation })
+        } else {
+          alert('Location not found. Try a different search term.')
+        }
+      } else {
+        alert('Failed to find location')
+      }
+    } catch (error) {
+      console.error('Error searching location:', error)
+      alert('Error searching for location')
+    } finally {
+      setSearchingLocation(false)
+    }
+  }
+
+  const clearSearchLocation = () => {
+    setSearchCoords(null)
+    setSearchLocation('')
+    setSuggestedHotels([])
+  }
+
   const searchNearbyHotels = async () => {
-    if (!site?.venueLat || !site?.venueLng) {
-      alert('Please set your venue location first in the Venue Details page')
+    // Use custom search location if set, otherwise use venue
+    const lat = searchCoords?.lat || site?.venueLat
+    const lng = searchCoords?.lng || site?.venueLng
+
+    if (!lat || !lng) {
+      alert('Please enter a location to search or set your venue location')
       return
     }
 
     setSearchingHotels(true)
     try {
       const response = await fetch(
-        `/api/places/hotels?lat=${site.venueLat}&lng=${site.venueLng}&radius=${searchRadius}`
+        `/api/places/hotels?lat=${lat}&lng=${lng}&radius=${searchRadius}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -251,104 +291,143 @@ export default function AccommodationManagement() {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Find Nearby Hotels</h2>
 
-          {!site?.venueLat || !site?.venueLng ? (
-            <div className="text-center py-8">
-              <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">Set your venue location first to search for nearby hotels</p>
-              <Link
-                href={`/dashboard/sites/${siteId}/edit?tab=venue`}
-                className="text-pink-600 hover:text-pink-700 font-medium"
+          {/* Location Search */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search Location</label>
+            <p className="text-sm text-gray-500 mb-3">
+              Enter a city, town, or area to search for hotels. Leave blank to search near your venue.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <input
+                type="text"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && searchForLocation()}
+                placeholder="e.g., Barcelona, Spain or Sitges"
+                className="flex-1 min-w-[250px] px-3 py-2 border border-gray-300 rounded-md text-black focus:ring-pink-500 focus:border-pink-500"
+              />
+              <button
+                onClick={searchForLocation}
+                disabled={searchingLocation || !searchLocation.trim()}
+                className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 disabled:opacity-50 flex items-center space-x-2"
               >
-                Go to Venue Details
-              </Link>
+                {searchingLocation ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MapPin className="h-4 w-4" />
+                )}
+                <span>{searchingLocation ? 'Finding...' : 'Set Location'}</span>
+              </button>
             </div>
-          ) : (
-            <>
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Search Radius</label>
-                  <select
-                    value={searchRadius}
-                    onChange={(e) => setSearchRadius(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md text-black"
-                  >
-                    <option value="2000">2 km</option>
-                    <option value="5000">5 km</option>
-                    <option value="10000">10 km</option>
-                    <option value="20000">20 km</option>
-                    <option value="50000">50 km</option>
-                  </select>
+
+            {/* Show selected search location */}
+            {searchCoords && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-800">
+                    Searching near: <strong>{searchCoords.name}</strong>
+                  </span>
                 </div>
                 <button
-                  onClick={searchNearbyHotels}
-                  disabled={searchingHotels}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2 mt-6"
+                  onClick={clearSearchLocation}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  {searchingHotels ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Search className="h-4 w-4" />
-                  )}
-                  <span>{searchingHotels ? 'Searching...' : 'Search Hotels'}</span>
+                  Clear
                 </button>
               </div>
+            )}
 
-              {suggestedHotels.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">
-                    Found {suggestedHotels.length} hotels nearby
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                    {suggestedHotels.map((hotel) => (
-                      <div
-                        key={hotel.placeId}
-                        className={`border rounded-lg p-4 ${
-                          selectedHotels.find(h => h.placeId === hotel.placeId)
-                            ? 'border-green-500 bg-green-50'
-                            : 'border-gray-200 hover:border-pink-300'
-                        }`}
-                      >
-                        {hotel.photo && (
-                          <img
-                            src={hotel.photo}
-                            alt={hotel.name}
-                            className="w-full h-32 object-cover rounded-md mb-3"
-                          />
-                        )}
-                        <h4 className="font-medium text-gray-900 text-sm">{hotel.name}</h4>
-                        <p className="text-xs text-gray-500 mt-1">{hotel.address}</p>
-                        <div className="flex items-center mt-2 space-x-2">
-                          {hotel.rating && (
-                            <div className="flex items-center text-xs">
-                              <Star className="h-3 w-3 text-yellow-500 mr-1" />
-                              <span>{hotel.rating}</span>
-                              <span className="text-gray-400 ml-1">({hotel.totalRatings})</span>
-                            </div>
-                          )}
-                          {hotel.priceLevel && (
-                            <span className="text-xs text-green-600">{getPriceLevelText(hotel.priceLevel)}</span>
-                          )}
-                        </div>
-                        <button
-                          onClick={() =>
-                            selectedHotels.find(h => h.placeId === hotel.placeId)
-                              ? removeHotel(hotel.placeId)
-                              : addHotel(hotel)
-                          }
-                          className={`mt-3 w-full py-1 px-2 rounded text-xs font-medium ${
-                            selectedHotels.find(h => h.placeId === hotel.placeId)
-                              ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                              : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
-                          }`}
-                        >
-                          {selectedHotels.find(h => h.placeId === hotel.placeId) ? 'Remove' : 'Add to List'}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            {!searchCoords && site?.venueLat && site?.venueLng && (
+              <p className="mt-2 text-sm text-gray-500">
+                Currently searching near venue: {site.venueName}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-end gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Search Radius</label>
+              <select
+                value={searchRadius}
+                onChange={(e) => setSearchRadius(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md text-black"
+              >
+                <option value="2000">2 km</option>
+                <option value="5000">5 km</option>
+                <option value="10000">10 km</option>
+                <option value="20000">20 km</option>
+                <option value="50000">50 km</option>
+              </select>
+            </div>
+            <button
+              onClick={searchNearbyHotels}
+              disabled={searchingHotels || (!searchCoords && !site?.venueLat)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+            >
+              {searchingHotels ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
               )}
-            </>
+              <span>{searchingHotels ? 'Searching...' : 'Search Hotels'}</span>
+            </button>
+          </div>
+
+          {suggestedHotels.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">
+                Found {suggestedHotels.length} hotels {searchCoords ? `near ${searchCoords.name}` : 'nearby'}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                {suggestedHotels.map((hotel) => (
+                  <div
+                    key={hotel.placeId}
+                    className={`border rounded-lg p-4 ${
+                      selectedHotels.find(h => h.placeId === hotel.placeId)
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-pink-300'
+                    }`}
+                  >
+                    {hotel.photo && (
+                      <img
+                        src={hotel.photo}
+                        alt={hotel.name}
+                        className="w-full h-32 object-cover rounded-md mb-3"
+                      />
+                    )}
+                    <h4 className="font-medium text-gray-900 text-sm">{hotel.name}</h4>
+                    <p className="text-xs text-gray-500 mt-1">{hotel.address}</p>
+                    <div className="flex items-center mt-2 space-x-2">
+                      {hotel.rating && (
+                        <div className="flex items-center text-xs">
+                          <Star className="h-3 w-3 text-yellow-500 mr-1" />
+                          <span>{hotel.rating}</span>
+                          <span className="text-gray-400 ml-1">({hotel.totalRatings})</span>
+                        </div>
+                      )}
+                      {hotel.priceLevel && (
+                        <span className="text-xs text-green-600">{getPriceLevelText(hotel.priceLevel)}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() =>
+                        selectedHotels.find(h => h.placeId === hotel.placeId)
+                          ? removeHotel(hotel.placeId)
+                          : addHotel(hotel)
+                      }
+                      className={`mt-3 w-full py-1 px-2 rounded text-xs font-medium ${
+                        selectedHotels.find(h => h.placeId === hotel.placeId)
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                          : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
+                      }`}
+                    >
+                      {selectedHotels.find(h => h.placeId === hotel.placeId) ? 'Remove' : 'Add to List'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
