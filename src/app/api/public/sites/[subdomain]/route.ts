@@ -53,6 +53,8 @@ export async function GET(
         venueLat: true,
         venueLng: true,
         venueGoogleMapsUrl: true,
+        venuePhotos: true,
+        venuePlaceId: true,
         createdAt: true,
         updatedAt: true
       }

@@ -74,6 +74,8 @@ model WeddingSite {
   venueLat          Float?
   venueLng          Float?
   venueGoogleMapsUrl String?
+  venuePhotos       String[]  // Photos fetched from Google Places API
+  venuePlaceId      String?   // Google Place ID for fetching photos
 
   // Payment Settings
   paypalEmail       String?

@@ -34,6 +34,8 @@ interface WeddingSite {
   venueLat?: number
   venueLng?: number
   venueGoogleMapsUrl?: string
+  venuePhotos?: string[]
+  venuePlaceId?: string
   primaryColor: string
   secondaryColor: string
   fontFamily: string
@@ -75,34 +77,65 @@ export default function EditWeddingDetails() {
   const [geocoding, setGeocoding] = useState(false)
 
   const lookupVenueLocation = async () => {
-    if (!formData.venueAddress) {
-      alert('Please enter a venue address first')
+    if (!formData.venueName && !formData.venueAddress) {
+      alert('Please enter a venue name or address first')
       return
     }
 
     setGeocoding(true)
     try {
-      const fullAddress = [
+      // Build search query - prioritize venue name for better photo results
+      const searchQuery = [
+        formData.venueName,
         formData.venueAddress,
         formData.venueCity,
-        formData.venueState,
-        formData.venueZip,
         formData.venueCountry
       ].filter(Boolean).join(', ')
 
-      const response = await fetch(`/api/geocode?address=${encodeURIComponent(fullAddress)}`)
-      const data = await response.json()
+      // Try Google Places API first for photos
+      const placesResponse = await fetch(`/api/places/search?query=${encodeURIComponent(searchQuery)}`)
 
-      if (response.ok) {
-        updateFormData('venueLat', data.lat)
-        updateFormData('venueLng', data.lng)
-        updateFormData('venueGoogleMapsUrl', data.googleMapsUrl)
-        alert('Location found successfully!')
+      if (placesResponse.ok) {
+        const placesData = await placesResponse.json()
+
+        setFormData(prev => ({
+          ...prev,
+          venueLat: placesData.lat,
+          venueLng: placesData.lng,
+          venueGoogleMapsUrl: placesData.googleMapsUrl,
+          venuePlaceId: placesData.placeId,
+          venuePhotos: placesData.photos || []
+        }))
+
+        const photoCount = placesData.photos?.length || 0
+        alert(`Location found! ${photoCount} venue photo${photoCount !== 1 ? 's' : ''} loaded.`)
       } else {
-        alert(data.error || 'Location not found')
+        // Fallback to Nominatim geocoding (no photos)
+        const fullAddress = [
+          formData.venueAddress,
+          formData.venueCity,
+          formData.venueState,
+          formData.venueZip,
+          formData.venueCountry
+        ].filter(Boolean).join(', ')
+
+        const response = await fetch(`/api/geocode?address=${encodeURIComponent(fullAddress)}`)
+        const data = await response.json()
+
+        if (response.ok) {
+          setFormData(prev => ({
+            ...prev,
+            venueLat: data.lat,
+            venueLng: data.lng,
+            venueGoogleMapsUrl: data.googleMapsUrl
+          }))
+          alert('Location found! (No venue photos available - Google Places API key may not be configured)')
+        } else {
+          alert(data.error || 'Location not found')
+        }
       }
     } catch (error) {
-      console.error('Geocoding error:', error)
+      console.error('Location lookup error:', error)
       alert('Failed to lookup location')
     } finally {
       setGeocoding(false)

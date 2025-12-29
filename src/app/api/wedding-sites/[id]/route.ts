@@ -143,6 +143,11 @@ export async function PUT(
         bankReference: data.bankReference !== undefined ? data.bankReference : weddingSite.bankReference,
         giftMessage: data.giftMessage !== undefined ? data.giftMessage : weddingSite.giftMessage,
         giftCurrency: data.giftCurrency !== undefined ? data.giftCurrency : weddingSite.giftCurrency,
+        venueLat: data.venueLat !== undefined ? data.venueLat : weddingSite.venueLat,
+        venueLng: data.venueLng !== undefined ? data.venueLng : weddingSite.venueLng,
+        venueGoogleMapsUrl: data.venueGoogleMapsUrl !== undefined ? data.venueGoogleMapsUrl : weddingSite.venueGoogleMapsUrl,
+        venuePhotos: data.venuePhotos !== undefined ? data.venuePhotos : weddingSite.venuePhotos,
+        venuePlaceId: data.venuePlaceId !== undefined ? data.venuePlaceId : weddingSite.venuePlaceId,
       }
     })
 
