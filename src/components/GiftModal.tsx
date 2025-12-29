@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { X, Gift, Heart, Check, CreditCard, Building } from 'lucide-react'
+import { getCurrencySymbol } from '@/lib/utils'
 
 interface GiftModalProps {
   isOpen: boolean
@@ -12,6 +13,7 @@ interface GiftModalProps {
   partner2Name: string
   paypalEmail?: string
   giftMessage?: string
+  giftCurrency?: string
 }
 
 export default function GiftModal({
@@ -22,8 +24,10 @@ export default function GiftModal({
   partner1Name,
   partner2Name,
   paypalEmail,
-  giftMessage
+  giftMessage,
+  giftCurrency = 'USD'
 }: GiftModalProps) {
+  const currencySymbol = getCurrencySymbol(giftCurrency)
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -244,10 +248,10 @@ export default function GiftModal({
                 <>
                   <div>
                     <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-                      Gift Amount *
+                      Gift Amount ({giftCurrency}) *
                     </label>
                     <div className="mt-1 relative">
-                      <span className="absolute left-3 top-2 text-gray-500">$</span>
+                      <span className="absolute left-3 top-2 text-gray-500">{currencySymbol}</span>
                       <input
                         type="number"
                         id="amount"
@@ -257,7 +261,7 @@ export default function GiftModal({
                         step="0.01"
                         value={formData.amount}
                         onChange={handleChange}
-                        className="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 text-black"
+                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 text-black"
                         style={{ focusRingColor: primaryColor }}
                       />
                     </div>

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe, Search } from 'lucide-react'
-import { generateSubdomain, isValidSubdomain } from '@/lib/utils'
+import { generateSubdomain, isValidSubdomain, getCurrencyForCountry } from '@/lib/utils'
 
 export default function CreateWeddingSite() {
   const { data: session } = useSession()
@@ -34,7 +34,8 @@ export default function CreateWeddingSite() {
     primaryColor: '#d946ef',
     secondaryColor: '#f3f4f6',
     welcomeMessage: '',
-    aboutUsStory: ''
+    aboutUsStory: '',
+    giftCurrency: 'USD'
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -47,6 +48,11 @@ export default function CreateWeddingSite() {
         if (updated.partner1Name && updated.partner2Name) {
           updated.subdomain = generateSubdomain(updated.partner1Name, updated.partner2Name)
         }
+      }
+
+      // Auto-set currency when country changes
+      if (name === 'venueCountry') {
+        updated.giftCurrency = getCurrencyForCountry(value)
       }
 
       return updated

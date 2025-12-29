@@ -24,6 +24,7 @@ interface WeddingSite {
   paypalEmail?: string
   bankDetails?: string
   giftMessage?: string
+  giftCurrency: string
 }
 
 interface GiftRecord {
@@ -68,7 +69,8 @@ export default function GiftSettings() {
     giftsEnabled: false,
     paypalEmail: '',
     bankDetails: '',
-    giftMessage: ''
+    giftMessage: '',
+    giftCurrency: 'EUR'
   })
 
   useEffect(() => {
@@ -96,7 +98,8 @@ export default function GiftSettings() {
           giftsEnabled: siteData.giftsEnabled || false,
           paypalEmail: siteData.paypalEmail || '',
           bankDetails: siteData.bankDetails || '',
-          giftMessage: siteData.giftMessage || ''
+          giftMessage: siteData.giftMessage || '',
+          giftCurrency: siteData.giftCurrency || 'EUR'
         })
       }
 
@@ -287,6 +290,39 @@ export default function GiftSettings() {
                       />
                       <p className="mt-1 text-sm text-gray-500">
                         This message will be shown to guests when they visit the gift section.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Gift Currency
+                      </label>
+                      <select
+                        value={formData.giftCurrency}
+                        onChange={(e) => updateFormData('giftCurrency', e.target.value)}
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      >
+                        <option value="EUR">€ Euro (EUR)</option>
+                        <option value="USD">$ US Dollar (USD)</option>
+                        <option value="GBP">£ British Pound (GBP)</option>
+                        <option value="CAD">$ Canadian Dollar (CAD)</option>
+                        <option value="AUD">$ Australian Dollar (AUD)</option>
+                        <option value="CHF">CHF Swiss Franc (CHF)</option>
+                        <option value="SEK">kr Swedish Krona (SEK)</option>
+                        <option value="NOK">kr Norwegian Krone (NOK)</option>
+                        <option value="DKK">kr Danish Krone (DKK)</option>
+                        <option value="PLN">zł Polish Złoty (PLN)</option>
+                        <option value="CZK">Kč Czech Koruna (CZK)</option>
+                        <option value="MXN">$ Mexican Peso (MXN)</option>
+                        <option value="BRL">R$ Brazilian Real (BRL)</option>
+                        <option value="JPY">¥ Japanese Yen (JPY)</option>
+                        <option value="INR">₹ Indian Rupee (INR)</option>
+                        <option value="SGD">$ Singapore Dollar (SGD)</option>
+                        <option value="NZD">$ New Zealand Dollar (NZD)</option>
+                        <option value="ZAR">R South African Rand (ZAR)</option>
+                      </select>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Select the currency for gift amounts. This will be shown to guests.
                       </p>
                     </div>
 

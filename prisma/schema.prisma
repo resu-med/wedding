@@ -79,6 +79,7 @@ model WeddingSite {
   paypalEmail       String?
   bankDetails       String?
   giftMessage       String?
+  giftCurrency      String    @default("USD")
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt

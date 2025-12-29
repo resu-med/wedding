@@ -36,6 +36,7 @@ interface WeddingSite {
   rsvpDeadline?: string
   paypalEmail?: string
   giftMessage?: string
+  giftCurrency?: string
 }
 
 export default function PublicWeddingSite() {
@@ -373,6 +374,7 @@ export default function PublicWeddingSite() {
           partner2Name={site.partner2Name}
           paypalEmail={site.paypalEmail}
           giftMessage={site.giftMessage}
+          giftCurrency={site.giftCurrency}
         />
       )}
     </div>

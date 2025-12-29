@@ -46,6 +46,7 @@ interface WeddingSite {
   paypalEmail?: string
   bankDetails?: string
   giftMessage?: string
+  giftCurrency?: string
   createdAt: string
   updatedAt: string
 }
@@ -393,6 +394,7 @@ export default function PublicWeddingSite() {
           partner2Name={site.partner2Name}
           paypalEmail={site.paypalEmail}
           giftMessage={site.giftMessage}
+          giftCurrency={site.giftCurrency}
         />
       )}
     </div>

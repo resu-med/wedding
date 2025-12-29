@@ -32,3 +32,65 @@ export function isValidSubdomain(subdomain: string): boolean {
   const regex = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/
   return regex.test(subdomain) && subdomain.length >= 3
 }
+
+// Map countries to their primary currencies
+const countryCurrencyMap: Record<string, string> = {
+  'Spain': 'EUR',
+  'France': 'EUR',
+  'Germany': 'EUR',
+  'Italy': 'EUR',
+  'Portugal': 'EUR',
+  'Netherlands': 'EUR',
+  'Belgium': 'EUR',
+  'Austria': 'EUR',
+  'Greece': 'EUR',
+  'Ireland': 'EUR',
+  'United States': 'USD',
+  'United Kingdom': 'GBP',
+  'Canada': 'CAD',
+  'Australia': 'AUD',
+  'New Zealand': 'NZD',
+  'Switzerland': 'CHF',
+  'Mexico': 'MXN',
+  'Brazil': 'BRL',
+  'Argentina': 'ARS',
+  'India': 'INR',
+  'Japan': 'JPY',
+  'South Korea': 'KRW',
+  'Singapore': 'SGD',
+  'Thailand': 'THB',
+  'Philippines': 'PHP',
+  'South Africa': 'ZAR',
+}
+
+export function getCurrencyForCountry(country: string): string {
+  return countryCurrencyMap[country] || 'USD'
+}
+
+export function getCurrencySymbol(currency: string): string {
+  const symbols: Record<string, string> = {
+    'EUR': '€',
+    'USD': '$',
+    'GBP': '£',
+    'CAD': 'CA$',
+    'AUD': 'A$',
+    'NZD': 'NZ$',
+    'CHF': 'CHF',
+    'MXN': 'MX$',
+    'BRL': 'R$',
+    'ARS': 'AR$',
+    'INR': '₹',
+    'JPY': '¥',
+    'KRW': '₩',
+    'SGD': 'S$',
+    'THB': '฿',
+    'PHP': '₱',
+    'ZAR': 'R',
+    'SEK': 'kr',
+    'NOK': 'kr',
+    'DKK': 'kr',
+    'PLN': 'zł',
+    'CZK': 'Kč',
+  }
+  return symbols[currency] || currency
+}
