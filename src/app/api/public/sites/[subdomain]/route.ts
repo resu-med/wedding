@@ -43,7 +43,16 @@ export async function GET(
         transportInfo: true,
         specialRequests: true,
         paypalEmail: true,
+        bankName: true,
+        bankAccountName: true,
+        bankIban: true,
+        bankBic: true,
+        bankReference: true,
         giftMessage: true,
+        giftCurrency: true,
+        venueLat: true,
+        venueLng: true,
+        venueGoogleMapsUrl: true,
         createdAt: true,
         updatedAt: true
       }
@@ -56,7 +65,6 @@ export async function GET(
       )
     }
 
-    // Don't expose sensitive information like bank details
     return NextResponse.json(weddingSite)
   } catch (error) {
     console.error('Error fetching public wedding site:', error)
