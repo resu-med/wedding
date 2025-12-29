@@ -33,6 +33,7 @@ interface WeddingSite {
   secondaryColor: string
   fontFamily: string
   heroImage?: string
+  couplePhoto?: string
   galleryImages: string[]
   rsvpEnabled: boolean
   rsvpDeadline?: string
@@ -163,7 +164,30 @@ export default function PublicWeddingSite() {
       <section id="home" className="relative py-20 text-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <Heart className="h-20 w-20 mx-auto mb-6" style={{ color: site.primaryColor }} />
+            {/* Couple Photo or Heart Icon */}
+            {site.couplePhoto ? (
+              <div className="mb-8">
+                <div className="relative inline-block">
+                  <div
+                    className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden mx-auto shadow-2xl ring-4 ring-white"
+                    style={{ boxShadow: `0 0 0 4px white, 0 0 0 8px ${site.primaryColor}30, 0 25px 50px -12px rgba(0, 0, 0, 0.25)` }}
+                  >
+                    <img
+                      src={site.couplePhoto}
+                      alt={`${site.partner1Name} and ${site.partner2Name}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white rounded-full p-2 shadow-lg"
+                  >
+                    <Heart className="h-6 w-6" style={{ color: site.primaryColor, fill: site.primaryColor }} />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Heart className="h-20 w-20 mx-auto mb-6" style={{ color: site.primaryColor }} />
+            )}
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-4">
               {site.partner1Name}
               <span className="text-gray-600 mx-4">&</span>

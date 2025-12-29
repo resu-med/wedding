@@ -52,6 +52,7 @@ model WeddingSite {
   secondaryColor    String    @default("#f3f4f6")
   fontFamily        String    @default("Inter")
   heroImage         String?
+  couplePhoto       String?   // Photo of the couple for prominent display
   galleryImages     String[]
 
   // Settings

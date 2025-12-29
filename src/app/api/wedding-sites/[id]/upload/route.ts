@@ -57,7 +57,7 @@ export async function POST(
       )
     }
 
-    if (!['hero', 'gallery'].includes(type)) {
+    if (!['hero', 'gallery', 'couple'].includes(type)) {
       return NextResponse.json(
         { error: 'Invalid upload type' },
         { status: 400 }
@@ -89,11 +89,16 @@ export async function POST(
     // Create public URL
     const imageUrl = `/uploads/${resolvedParams.id}/${filename}`
 
-    // Update database
+    // Update database based on type
     if (type === 'hero') {
       await prisma.weddingSite.update({
         where: { id: resolvedParams.id },
         data: { heroImage: imageUrl }
+      })
+    } else if (type === 'couple') {
+      await prisma.weddingSite.update({
+        where: { id: resolvedParams.id },
+        data: { couplePhoto: imageUrl }
       })
     } else {
       // Add to gallery images
@@ -108,6 +113,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
+      url: imageUrl,
       imageUrl,
       message: 'Image uploaded successfully'
     })

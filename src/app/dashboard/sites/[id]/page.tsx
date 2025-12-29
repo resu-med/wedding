@@ -218,9 +218,9 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
             description="Manage your guest list, send invitations, and track RSVPs"
             icon={<Users className="h-8 w-8 text-blue-500" />}
             actions={[
-              { label: "Manage Guests", href: `/dashboard/sites/${siteId}/guests`, primary: true },
-              { label: "Send Invitations", href: "#" },
-              { label: "RSVP Reports", href: "#" }
+              { label: "RSVP Dashboard", href: `/dashboard/sites/${siteId}/rsvp-dashboard`, primary: true },
+              { label: "Manage Guests", href: `/dashboard/sites/${siteId}/guests` },
+              { label: "Send Invitations", href: "#" }
             ]}
           />
 

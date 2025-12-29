@@ -29,6 +29,7 @@ export async function GET(
         secondaryColor: true,
         fontFamily: true,
         heroImage: true,
+        couplePhoto: true,
         galleryImages: true,
         rsvpEnabled: true,
         rsvpDeadline: true,

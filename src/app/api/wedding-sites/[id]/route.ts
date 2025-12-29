@@ -148,6 +148,7 @@ export async function PUT(
         venueGoogleMapsUrl: data.venueGoogleMapsUrl !== undefined ? data.venueGoogleMapsUrl : weddingSite.venueGoogleMapsUrl,
         venuePhotos: data.venuePhotos !== undefined ? data.venuePhotos : weddingSite.venuePhotos,
         venuePlaceId: data.venuePlaceId !== undefined ? data.venuePlaceId : weddingSite.venuePlaceId,
+        couplePhoto: data.couplePhoto !== undefined ? data.couplePhoto : weddingSite.couplePhoto,
       }
     })
 

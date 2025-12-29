@@ -13,7 +13,10 @@ import {
   Users,
   Heart,
   Clock,
-  Search
+  Search,
+  Camera,
+  Upload,
+  X
 } from 'lucide-react'
 
 interface WeddingSite {
@@ -39,6 +42,7 @@ interface WeddingSite {
   primaryColor: string
   secondaryColor: string
   fontFamily: string
+  couplePhoto?: string
   rsvpEnabled: boolean
   rsvpDeadline?: string
   giftsEnabled: boolean
@@ -75,6 +79,53 @@ export default function EditWeddingDetails() {
 
   const [formData, setFormData] = useState<Partial<WeddingSite>>({})
   const [geocoding, setGeocoding] = useState(false)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+
+  const handleCouplePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be less than 5MB')
+      return
+    }
+
+    setUploadingPhoto(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      formDataUpload.append('type', 'couple')
+
+      const response = await fetch(`/api/wedding-sites/${siteId}/upload`, {
+        method: 'POST',
+        body: formDataUpload,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setFormData(prev => ({ ...prev, couplePhoto: data.url }))
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Failed to upload image')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload image')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }
+
+  const removeCouplePhoto = () => {
+    setFormData(prev => ({ ...prev, couplePhoto: undefined }))
+  }
 
   const lookupVenueLocation = async () => {
     if (!formData.venueName && !formData.venueAddress) {
@@ -342,6 +393,56 @@ export default function EditWeddingDetails() {
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
                     />
                   </div>
+                </div>
+
+                {/* Couple Photo Upload */}
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <h4 className="text-md font-medium text-gray-900 mb-4 flex items-center">
+                    <Camera className="h-5 w-5 mr-2 text-pink-500" />
+                    Couple Photo
+                  </h4>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Upload a photo of you and your partner. This will be displayed prominently on your wedding website.
+                  </p>
+
+                  {formData.couplePhoto ? (
+                    <div className="relative inline-block">
+                      <img
+                        src={formData.couplePhoto}
+                        alt="Couple photo"
+                        className="w-64 h-64 object-cover rounded-lg shadow-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeCouplePhoto}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-lg"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-64 h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCouplePhotoUpload}
+                        className="hidden"
+                        disabled={uploadingPhoto}
+                      />
+                      {uploadingPhoto ? (
+                        <div className="flex flex-col items-center">
+                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-500 mb-3"></div>
+                          <span className="text-sm text-gray-500">Uploading...</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <Upload className="h-10 w-10 text-gray-400 mb-3" />
+                          <span className="text-sm font-medium text-gray-600">Click to upload</span>
+                          <span className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
+                        </div>
+                      )}
+                    </label>
+                  )}
                 </div>
               </div>
             )}
