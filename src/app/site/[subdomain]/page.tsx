@@ -382,78 +382,93 @@ export default function PublicWeddingSite() {
             {/* Hotel Cards */}
             {site.accommodationPlaces && site.accommodationPlaces.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {site.accommodationPlaces.map((place) => (
-                  <div key={place.placeId} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                    {place.photo ? (
-                      <img
-                        src={place.photo}
-                        alt={place.name}
-                        className="w-full h-48 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                        <Hotel className="h-16 w-16 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <h3 className="font-bold text-lg text-gray-900 mb-2">{place.name}</h3>
-                      {place.address && (
-                        <p className="text-sm text-gray-600 mb-3 flex items-start">
-                          <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" style={{ color: site.primaryColor }} />
-                          {place.address}
-                        </p>
-                      )}
-                      {place.rating && (
-                        <div className="flex items-center mb-3">
-                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                          <span className="font-medium text-gray-900">{place.rating}</span>
-                          {place.totalRatings > 0 && (
-                            <span className="text-gray-500 text-sm ml-1">({place.totalRatings} reviews)</span>
+                {site.accommodationPlaces.map((place) => {
+                  const bookingUrl = place.website
+                    ? (place.website.startsWith('http') ? place.website : `https://${place.website}`)
+                    : `https://www.google.com/search?q=${encodeURIComponent(place.name + ' ' + (place.address || '') + ' book')}`
+
+                  return (
+                    <div key={place.placeId} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
+                      <a href={bookingUrl} target="_blank" rel="noopener noreferrer" className="block">
+                        {place.photo ? (
+                          <img
+                            src={place.photo}
+                            alt={place.name}
+                            className="w-full h-48 object-cover hover:opacity-90 transition-opacity"
+                          />
+                        ) : (
+                          <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <Hotel className="h-16 w-16 text-gray-400" />
+                          </div>
+                        )}
+                      </a>
+                      <div className="p-5 flex-1 flex flex-col">
+                        <a
+                          href={bookingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-bold text-lg text-gray-900 mb-2 hover:underline"
+                        >
+                          {place.name}
+                        </a>
+                        {place.address && (
+                          <p className="text-sm text-gray-600 mb-3 flex items-start">
+                            <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" style={{ color: site.primaryColor }} />
+                            {place.address}
+                          </p>
+                        )}
+                        {place.rating && (
+                          <div className="flex items-center mb-3">
+                            <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                            <span className="font-medium text-gray-900">{place.rating}</span>
+                            {place.totalRatings > 0 && (
+                              <span className="text-gray-500 text-sm ml-1">({place.totalRatings} reviews)</span>
+                            )}
+                          </div>
+                        )}
+                        {place.notes && (
+                          <p className="text-sm text-gray-600 italic mb-3 bg-gray-50 p-2 rounded">
+                            {place.notes}
+                          </p>
+                        )}
+
+                        {/* Book Now Button - Prominent */}
+                        <a
+                          href={bookingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-auto w-full py-2.5 px-4 text-center text-white font-semibold rounded-lg transition-colors hover:opacity-90"
+                          style={{ backgroundColor: site.primaryColor }}
+                        >
+                          View & Book
+                        </a>
+
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {place.phone && (
+                            <a
+                              href={`tel:${place.phone}`}
+                              className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                              <Phone className="h-4 w-4 mr-1" />
+                              Call
+                            </a>
+                          )}
+                          {place.location.lat !== 0 && place.location.lng !== 0 && (
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${place.location.lat},${place.location.lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                              <MapPin className="h-4 w-4 mr-1" />
+                              Map
+                            </a>
                           )}
                         </div>
-                      )}
-                      {place.notes && (
-                        <p className="text-sm text-gray-600 italic mb-3 bg-gray-50 p-2 rounded">
-                          {place.notes}
-                        </p>
-                      )}
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {place.website && (
-                          <a
-                            href={place.website.startsWith('http') ? place.website : `https://${place.website}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
-                            style={{ backgroundColor: `${site.primaryColor}15`, color: site.primaryColor }}
-                          >
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            Website
-                          </a>
-                        )}
-                        {place.phone && (
-                          <a
-                            href={`tel:${place.phone}`}
-                            className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                          >
-                            <Phone className="h-4 w-4 mr-1" />
-                            Call
-                          </a>
-                        )}
-                        {place.location.lat !== 0 && place.location.lng !== 0 && (
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${place.location.lat},${place.location.lng}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                          >
-                            <MapPin className="h-4 w-4 mr-1" />
-                            Map
-                          </a>
-                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
