@@ -39,7 +39,7 @@ export default function GiftModal({
 }: GiftModalProps) {
   const currencySymbol = getCurrencySymbol(giftCurrency)
   const hasBankDetails = bankName || bankIban
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1) // Step 1: Amount/Payment, Step 2: Your Info
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({
@@ -161,7 +161,7 @@ export default function GiftModal({
           </div>
           <div className="mt-4">
             <div className="flex space-x-2">
-              {[1, 2, 3].map((num) => (
+              {[1, 2].map((num) => (
                 <div
                   key={num}
                   className={`flex-1 h-2 rounded-full ${
@@ -178,8 +178,8 @@ export default function GiftModal({
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">Gift Type</h3>
-                <p className="text-gray-600">Choose how you&apos;d like to contribute</p>
+                <h3 className="text-xl font-semibold text-gray-900">Gift Details</h3>
+                <p className="text-gray-600">Choose an amount and payment method</p>
                 {giftMessage && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-700">{giftMessage}</p>
@@ -187,76 +187,7 @@ export default function GiftModal({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <label
-                  className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                    formData.giftType === 'MONETARY'
-                      ? 'border-opacity-100'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  style={{ borderColor: formData.giftType === 'MONETARY' ? primaryColor : undefined }}
-                >
-                  <input
-                    type="radio"
-                    name="giftType"
-                    value="MONETARY"
-                    checked={formData.giftType === 'MONETARY'}
-                    onChange={handleChange}
-                    className="sr-only"
-                  />
-                  <div className="text-center">
-                    <Heart className="h-8 w-8 mx-auto mb-2" style={{ color: primaryColor }} />
-                    <h4 className="font-semibold">Monetary Gift</h4>
-                    <p className="text-sm text-gray-600">Contribute to their future</p>
-                  </div>
-                </label>
-
-                <label
-                  className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                    formData.giftType === 'EXPERIENCE'
-                      ? 'border-opacity-100'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  style={{ borderColor: formData.giftType === 'EXPERIENCE' ? primaryColor : undefined }}
-                >
-                  <input
-                    type="radio"
-                    name="giftType"
-                    value="EXPERIENCE"
-                    checked={formData.giftType === 'EXPERIENCE'}
-                    onChange={handleChange}
-                    className="sr-only"
-                  />
-                  <div className="text-center">
-                    <Gift className="h-8 w-8 mx-auto mb-2" style={{ color: primaryColor }} />
-                    <h4 className="font-semibold">Experience Gift</h4>
-                    <p className="text-sm text-gray-600">Give a memorable experience</p>
-                  </div>
-                </label>
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className="py-2 px-6 rounded-lg font-semibold text-white"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">Gift Details</h3>
-                <p className="text-gray-600">Provide details about your gift</p>
-              </div>
-
-              {formData.giftType === 'MONETARY' && (
-                <>
+              <>
                   <div>
                     <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
                       Gift Amount ({giftCurrency}) *
@@ -377,26 +308,6 @@ export default function GiftModal({
                     )}
                   </div>
                 </>
-              )}
-
-              {formData.giftType === 'EXPERIENCE' && (
-                <div>
-                  <label htmlFor="giftDescription" className="block text-sm font-medium text-gray-700">
-                    Experience Description *
-                  </label>
-                  <textarea
-                    id="giftDescription"
-                    name="giftDescription"
-                    required
-                    rows={4}
-                    value={formData.giftDescription}
-                    onChange={handleChange}
-                    placeholder="Describe the experience you're giving..."
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 text-black"
-                    style={{ focusRingColor: primaryColor }}
-                  />
-                </div>
-              )}
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700">
@@ -414,21 +325,11 @@ export default function GiftModal({
                 />
               </div>
 
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="py-2 px-6 rounded-lg font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  Back
-                </button>
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={nextStep}
-                  disabled={
-                    (formData.giftType === 'MONETARY' && (!formData.amount || !formData.paymentMethod)) ||
-                    (formData.giftType === 'EXPERIENCE' && !formData.giftDescription)
-                  }
+                  disabled={!formData.amount || !formData.paymentMethod}
                   className="py-2 px-6 rounded-lg font-semibold text-white disabled:opacity-50"
                   style={{ backgroundColor: primaryColor }}
                 >
@@ -438,7 +339,7 @@ export default function GiftModal({
             </div>
           )}
 
-          {step === 3 && (
+          {step === 2 && (
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">Your Information</h3>
