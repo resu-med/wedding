@@ -13,6 +13,7 @@ export async function GET(
       select: {
         id: true,
         subdomain: true,
+        customDomain: true,
         partner1Name: true,
         partner2Name: true,
         partner1Email: true,

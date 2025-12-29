@@ -17,7 +17,8 @@ import {
   Edit,
   Eye,
   BarChart3,
-  Mail
+  Mail,
+  Globe
 } from 'lucide-react'
 
 interface WeddingSite {
@@ -292,6 +293,16 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
               { label: "View Analytics", href: `/dashboard/sites/${siteId}/analytics`, primary: true },
               { label: "RSVP Trends", href: "#" },
               { label: "Export Data", href: "#" }
+            ]}
+          />
+
+          {/* Custom Domain */}
+          <ManagementCard
+            title="Custom Domain"
+            description="Connect your own domain to make your wedding site URL memorable and easy to share"
+            icon={<Globe className="h-8 w-8 text-cyan-500" />}
+            actions={[
+              { label: "Domain Settings", href: `/dashboard/sites/${siteId}/domain`, primary: true }
             ]}
           />
         </div>

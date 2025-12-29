@@ -150,6 +150,7 @@ export async function PUT(
         venuePhotos: data.venuePhotos !== undefined ? data.venuePhotos : weddingSite.venuePhotos,
         venuePlaceId: data.venuePlaceId !== undefined ? data.venuePlaceId : weddingSite.venuePlaceId,
         couplePhoto: data.couplePhoto !== undefined ? data.couplePhoto : weddingSite.couplePhoto,
+        customDomain: data.customDomain !== undefined ? data.customDomain : weddingSite.customDomain,
       }
     })
 
