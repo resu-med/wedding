@@ -24,6 +24,29 @@ export default function CreateWeddingSite() {
   const [subdomainStatus, setSubdomainStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
   const [checkingSubdomain, setCheckingSubdomain] = useState(false)
 
+  const [formData, setFormData] = useState({
+    partner1Name: '',
+    partner2Name: '',
+    partner1Email: '',
+    weddingDate: '',
+    weddingTime: '',
+    venueName: '',
+    venueAddress: '',
+    venueCity: '',
+    venueState: '',
+    venueZip: '',
+    venueCountry: '',
+    venueLat: null as number | null,
+    venueLng: null as number | null,
+    venueGoogleMapsUrl: '',
+    subdomain: '',
+    primaryColor: '#d946ef',
+    secondaryColor: '#f3f4f6',
+    welcomeMessage: '',
+    aboutUsStory: '',
+    giftCurrency: 'USD'
+  })
+
   useEffect(() => {
     async function checkAccess() {
       try {
@@ -99,29 +122,6 @@ export default function CreateWeddingSite() {
       setProcessingPayment(false)
     }
   }
-
-  const [formData, setFormData] = useState({
-    partner1Name: '',
-    partner2Name: '',
-    partner1Email: '',
-    weddingDate: '',
-    weddingTime: '',
-    venueName: '',
-    venueAddress: '',
-    venueCity: '',
-    venueState: '',
-    venueZip: '',
-    venueCountry: '',
-    venueLat: null as number | null,
-    venueLng: null as number | null,
-    venueGoogleMapsUrl: '',
-    subdomain: '',
-    primaryColor: '#d946ef',
-    secondaryColor: '#f3f4f6',
-    welcomeMessage: '',
-    aboutUsStory: '',
-    giftCurrency: 'USD'
-  })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
