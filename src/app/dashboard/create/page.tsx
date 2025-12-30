@@ -197,7 +197,7 @@ export default function CreateWeddingSite() {
               Create Your Wedding Website
             </h1>
             <p className="text-gray-600 mb-6">
-              For just £79, get a beautiful, personalized wedding website with all the features you need.
+              For just £1, get a beautiful, personalized wedding website with all the features you need.
             </p>
 
             <div className="text-left bg-gray-50 rounded-lg p-4 mb-6">
@@ -241,7 +241,7 @@ export default function CreateWeddingSite() {
               disabled={processingPayment}
               className="w-full bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors disabled:opacity-50"
             >
-              {processingPayment ? 'Redirecting to checkout...' : 'Get Started for £79'}
+              {processingPayment ? 'Redirecting to checkout...' : 'Get Started for £1'}
             </button>
 
             <Link
