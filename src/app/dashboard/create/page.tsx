@@ -20,6 +20,7 @@ export default function CreateWeddingSite() {
     siteId?: string
   } | null>(null)
   const [processingPayment, setProcessingPayment] = useState(false)
+  const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>([])
 
   useEffect(() => {
     async function checkAccess() {
@@ -165,6 +166,12 @@ export default function CreateWeddingSite() {
       } else {
         const data = await response.json()
         setError(data.error || 'An error occurred')
+        // Show suggestions if subdomain is taken
+        if (data.suggestions) {
+          setSubdomainSuggestions(data.suggestions)
+        } else {
+          setSubdomainSuggestions([])
+        }
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
@@ -315,7 +322,28 @@ export default function CreateWeddingSite() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-              {error}
+              <p>{error}</p>
+              {subdomainSuggestions.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm text-gray-700 mb-2">Choose an available URL:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {subdomainSuggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => {
+                          setFormData(prev => ({ ...prev, subdomain: suggestion }))
+                          setError('')
+                          setSubdomainSuggestions([])
+                        }}
+                        className="px-3 py-1 bg-white border border-pink-300 text-pink-600 rounded-full text-sm hover:bg-pink-50 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
