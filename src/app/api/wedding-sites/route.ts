@@ -157,10 +157,16 @@ export async function POST(request: NextRequest) {
         venueState: data.venueState,
         venueZip: data.venueZip,
         venueCountry: data.venueCountry || 'United States',
+        venueLat: data.venueLat || null,
+        venueLng: data.venueLng || null,
+        venueGoogleMapsUrl: data.venueGoogleMapsUrl || null,
+        venuePlaceId: data.venuePlaceId || null,
+        venuePhotos: data.venuePhotos || [],
         primaryColor: data.primaryColor || '#d946ef',
         secondaryColor: data.secondaryColor || '#f3f4f6',
         welcomeMessage: data.welcomeMessage || null,
         aboutUsStory: data.aboutUsStory || null,
+        giftCurrency: data.giftCurrency || 'USD',
       }
     })
 
