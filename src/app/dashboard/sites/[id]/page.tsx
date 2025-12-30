@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
-  Settings,
   Users,
   Calendar,
   MapPin,
@@ -15,12 +14,15 @@ import {
   Camera,
   ExternalLink,
   Edit,
-  Eye,
   BarChart3,
-  Mail,
   Globe,
-  Trash2
+  Trash2,
+  ChevronRight,
+  Heart,
+  Clock,
+  Hotel
 } from 'lucide-react'
+import { Logo } from '@/components/Logo'
 
 interface WeddingSite {
   id: string
@@ -142,7 +144,7 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
 
       if (response.ok) {
         alert(`${type === 'all' ? 'All data' : type === 'rsvps' ? 'RSVP data' : 'Gift data'} cleared successfully!`)
-        fetchData() // Refresh the data
+        fetchData()
       } else {
         const data = await response.json()
         alert(data.error || 'Failed to clear data')
@@ -156,22 +158,32 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-pink-100 rounded-full mx-auto" />
+            <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin absolute top-0 left-1/2 -translate-x-1/2" />
+          </div>
+          <p className="text-gray-600 mt-4 font-medium">Loading your wedding site...</p>
+        </div>
       </div>
     )
   }
 
   if (error || !site) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Site Not Found</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Heart className="h-10 w-10 text-gray-400" />
+          </div>
+          <h1 className="text-2xl font-serif font-bold text-gray-900 mb-2">Site Not Found</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
           <Link
             href="/dashboard"
-            className="text-pink-600 hover:text-pink-500 font-medium"
+            className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-500 font-medium"
           >
+            <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Link>
         </div>
@@ -187,84 +199,100 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
     day: 'numeric'
   })
 
+  // Calculate days until wedding
+  const today = new Date()
+  const daysUntil = Math.ceil((weddingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-6">
+              <Link href="/" className="flex-shrink-0">
+                <Logo size="sm" />
+              </Link>
               <Link
                 href="/dashboard"
-                className="flex items-center text-gray-500 hover:text-gray-700"
+                className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back to Dashboard
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Dashboard</span>
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
-              <a
-                href={`/site/${site.subdomain}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center text-gray-500 hover:text-gray-700"
-              >
-                <ExternalLink className="h-5 w-5 mr-2" />
-                View Site
-              </a>
-            </div>
+            <a
+              href={`https://${site.subdomain}.weddingprepped.com`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              <span className="hidden sm:inline">View Site</span>
+            </a>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Site Header */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {site.partner1Name} & {site.partner2Name}
-              </h1>
-              <div className="mt-2 flex items-center space-x-4 text-gray-600">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  {formattedDate}
+        {/* Hero Card */}
+        <div className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 rounded-2xl p-6 sm:p-8 mb-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50" />
+          <div className="relative">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-serif font-bold mb-2">
+                  {site.partner1Name} & {site.partner2Name}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {formattedDate}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {site.venueName}
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {site.venueName}
-                </div>
+                <p className="mt-3 text-white/70 text-sm">
+                  {site.subdomain}.weddingprepped.com
+                </p>
               </div>
-              <div className="mt-2">
-                <span className="text-sm text-gray-500">Website: </span>
-                <span className="font-medium">localhost:3001/site/{site.subdomain}</span>
+              <div className="flex gap-3">
+                <Link
+                  href={`/dashboard/sites/${siteId}/edit`}
+                  className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-xl font-medium transition-colors"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit Details
+                </Link>
               </div>
             </div>
-            <div className="flex space-x-3">
-              <Link
-                href={`/dashboard/sites/${siteId}/edit`}
-                className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 flex items-center space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>Edit Details</span>
-              </Link>
-            </div>
+
+            {/* Countdown */}
+            {daysUntil > 0 && (
+              <div className="mt-6 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium">{daysUntil} days until your big day!</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
             title="Total RSVPs"
             value={rsvpStats ? `${rsvpStats.summary.attending + rsvpStats.summary.notAttending}` : '0'}
-            subtitle={rsvpStats ? `out of ${rsvpStats.summary.totalGuests} invited` : 'out of 0 invited'}
-            icon={<Users className="h-6 w-6 text-blue-500" />}
+            subtitle={rsvpStats ? `of ${rsvpStats.summary.totalGuests} invited` : 'of 0 invited'}
+            icon={<Users className="h-5 w-5" />}
             color="blue"
           />
           <StatCard
             title="Gifts Received"
             value={`${currencySymbol}${totalGiftAmount.toFixed(0)}`}
             subtitle={`${completedGifts.length} gift${completedGifts.length !== 1 ? 's' : ''}`}
-            icon={<Gift className="h-6 w-6 text-green-500" />}
+            icon={<Gift className="h-5 w-5" />}
             color="green"
           />
           <StatCard
@@ -273,146 +301,142 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
             subtitle={rsvpStats && rsvpStats.summary.totalGuests > 0
               ? `${Math.round((rsvpStats.summary.attending / rsvpStats.summary.totalGuests) * 100)}% of guests`
               : '0% of guests'}
-            icon={<Eye className="h-6 w-6 text-purple-500" />}
-            color="purple"
+            icon={<Heart className="h-5 w-5" />}
+            color="pink"
           />
           <StatCard
-            title="Awaiting Response"
+            title="Awaiting"
             value={rsvpStats ? `${rsvpStats.summary.pending}` : '0'}
-            subtitle="pending RSVPs"
-            icon={<MessageCircle className="h-6 w-6 text-orange-500" />}
-            color="orange"
+            subtitle="pending responses"
+            icon={<MessageCircle className="h-5 w-5" />}
+            color="amber"
           />
         </div>
 
-        {/* Management Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Guest Management */}
+        {/* Management Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           <ManagementCard
             title="Guest Management"
-            description="Manage your guest list, send invitations, and track RSVPs"
-            icon={<Users className="h-8 w-8 text-blue-500" />}
+            description="Manage your guest list and track RSVPs"
+            icon={<Users className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/guests`}
+            color="blue"
             actions={[
-              { label: "RSVP Dashboard", href: `/dashboard/sites/${siteId}/rsvp-dashboard`, primary: true },
-              { label: "Manage Guests", href: `/dashboard/sites/${siteId}/guests` },
-              { label: "Send Invitations", href: "#" }
+              { label: "RSVP Dashboard", href: `/dashboard/sites/${siteId}/rsvp-dashboard` },
+              { label: "Manage Guests", href: `/dashboard/sites/${siteId}/guests` }
             ]}
           />
 
-          {/* Wedding Details */}
           <ManagementCard
             title="Wedding Details"
-            description="Update ceremony and reception information, timeline, and venue details"
-            icon={<Calendar className="h-8 w-8 text-pink-500" />}
+            description="Edit venue, date, and ceremony info"
+            icon={<Calendar className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/edit`}
+            color="pink"
             actions={[
-              { label: "Edit Wedding Info", href: `/dashboard/sites/${siteId}/edit`, primary: true },
-              { label: "Venue Details", href: `/dashboard/sites/${siteId}/edit?tab=venue` },
-              { label: "Content", href: `/dashboard/sites/${siteId}/edit?tab=content` }
+              { label: "Edit Info", href: `/dashboard/sites/${siteId}/edit` }
             ]}
           />
 
-          {/* Gift Registry */}
           <ManagementCard
             title="Gift Registry"
-            description="Manage gift preferences, payment settings, and view received gifts"
-            icon={<Gift className="h-8 w-8 text-green-500" />}
+            description="Manage gifts and payment settings"
+            icon={<Gift className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/gift-settings`}
+            color="green"
             actions={[
-              { label: "Gift Settings", href: `/dashboard/sites/${siteId}/gift-settings`, primary: true },
-              { label: "Payment Setup", href: `/dashboard/sites/${siteId}/gift-settings?tab=payment` },
-              { label: "Gift Reports", href: `/dashboard/sites/${siteId}/gift-settings?tab=reports` }
+              { label: "Gift Settings", href: `/dashboard/sites/${siteId}/gift-settings` }
             ]}
           />
 
-          {/* Accommodation */}
+          <ManagementCard
+            title="Photo Gallery"
+            description="Upload and manage your photos"
+            icon={<Camera className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/gallery`}
+            color="purple"
+            actions={[
+              { label: "Manage Gallery", href: `/dashboard/sites/${siteId}/gallery` }
+            ]}
+          />
+
           <ManagementCard
             title="Accommodation"
-            description="Add recommended hotels and places to stay for your guests"
-            icon={<MapPin className="h-8 w-8 text-teal-500" />}
+            description="Add hotels for your guests"
+            icon={<Hotel className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/accommodation`}
+            color="teal"
             actions={[
-              { label: "Manage Stays", href: `/dashboard/sites/${siteId}/accommodation`, primary: true },
-              { label: "Edit Info", href: `/dashboard/sites/${siteId}/edit?tab=content` }
+              { label: "Manage Stays", href: `/dashboard/sites/${siteId}/accommodation` }
             ]}
           />
 
-          {/* Site Customization */}
           <ManagementCard
-            title="Site Customization"
-            description="Customize your website appearance, upload photos, and manage content"
-            icon={<Camera className="h-8 w-8 text-purple-500" />}
+            title="Announcements"
+            description="Send updates to your guests"
+            icon={<MessageCircle className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/announcements`}
+            color="orange"
             actions={[
-              { label: "Edit Design", href: `/dashboard/sites/${siteId}/edit?tab=settings`, primary: true },
-              { label: "Photo Gallery", href: `/dashboard/sites/${siteId}/gallery` },
-              { label: "Content Editor", href: `/dashboard/sites/${siteId}/edit?tab=content` }
+              { label: "Manage", href: `/dashboard/sites/${siteId}/announcements` }
             ]}
           />
 
-          {/* Communication */}
-          <ManagementCard
-            title="Guest Communication"
-            description="Send announcements, updates, and manage guest messages"
-            icon={<Mail className="h-8 w-8 text-orange-500" />}
-            actions={[
-              { label: "Manage Announcements", href: `/dashboard/sites/${siteId}/announcements`, primary: true },
-              { label: "View Messages", href: "#" },
-              { label: "Email Templates", href: "#" }
-            ]}
-          />
-
-          {/* Analytics */}
           <ManagementCard
             title="Analytics"
-            description="View site statistics, RSVP trends, and guest engagement metrics"
-            icon={<BarChart3 className="h-8 w-8 text-indigo-500" />}
+            description="View site stats and engagement"
+            icon={<BarChart3 className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/analytics`}
+            color="indigo"
             actions={[
-              { label: "View Analytics", href: `/dashboard/sites/${siteId}/analytics`, primary: true },
-              { label: "RSVP Trends", href: "#" },
-              { label: "Export Data", href: "#" }
+              { label: "View Stats", href: `/dashboard/sites/${siteId}/analytics` }
             ]}
           />
 
-          {/* Custom Domain */}
           <ManagementCard
             title="Custom Domain"
-            description="Connect your own domain to make your wedding site URL memorable and easy to share"
-            icon={<Globe className="h-8 w-8 text-cyan-500" />}
+            description="Connect your own domain"
+            icon={<Globe className="h-6 w-6" />}
+            href={`/dashboard/sites/${siteId}/domain`}
+            color="cyan"
             actions={[
-              { label: "Domain Settings", href: `/dashboard/sites/${siteId}/domain`, primary: true }
+              { label: "Settings", href: `/dashboard/sites/${siteId}/domain` }
             ]}
           />
 
-          {/* Data Management */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <Trash2 className="h-8 w-8 text-red-500" />
+          {/* Data Management Card */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:border-red-100 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-600">
+                <Trash2 className="h-5 w-5" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-medium text-gray-900">Data Management</h3>
-                <p className="mt-1 text-sm text-gray-600">Clear RSVP responses or gift records. Useful for testing or starting fresh.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={() => clearData('rsvps')}
-                    disabled={clearing !== null}
-                    className="px-3 py-2 rounded text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-50"
-                  >
-                    {clearing === 'rsvps' ? 'Clearing...' : 'Clear RSVPs'}
-                  </button>
-                  <button
-                    onClick={() => clearData('gifts')}
-                    disabled={clearing !== null}
-                    className="px-3 py-2 rounded text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-50"
-                  >
-                    {clearing === 'gifts' ? 'Clearing...' : 'Clear Gifts'}
-                  </button>
-                  <button
-                    onClick={() => clearData('all')}
-                    disabled={clearing !== null}
-                    className="px-3 py-2 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
-                  >
-                    {clearing === 'all' ? 'Clearing...' : 'Clear All Data'}
-                  </button>
-                </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Data Management</h3>
+                <p className="text-sm text-gray-500">Clear test data</p>
               </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button
+                onClick={() => clearData('rsvps')}
+                disabled={clearing !== null}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+              >
+                {clearing === 'rsvps' ? 'Clearing...' : 'Clear RSVPs'}
+              </button>
+              <button
+                onClick={() => clearData('gifts')}
+                disabled={clearing !== null}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+              >
+                {clearing === 'gifts' ? 'Clearing...' : 'Clear Gifts'}
+              </button>
+              <button
+                onClick={() => clearData('all')}
+                disabled={clearing !== null}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors"
+              >
+                {clearing === 'all' ? 'Clearing...' : 'Clear All'}
+              </button>
             </div>
           </div>
         </div>
@@ -426,56 +450,63 @@ function StatCard({ title, value, subtitle, icon, color }: {
   value: string
   subtitle: string
   icon: React.ReactNode
-  color: string
+  color: 'blue' | 'green' | 'pink' | 'amber' | 'purple' | 'orange'
 }) {
+  const colors = {
+    blue: 'bg-blue-50 text-blue-600',
+    green: 'bg-green-50 text-green-600',
+    pink: 'bg-pink-50 text-pink-600',
+    amber: 'bg-amber-50 text-amber-600',
+    purple: 'bg-purple-50 text-purple-600',
+    orange: 'bg-orange-50 text-orange-600'
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-semibold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-500">{subtitle}</p>
-        </div>
-        <div className="flex-shrink-0">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-medium text-gray-500">{title}</span>
+        <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center`}>
           {icon}
         </div>
       </div>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
     </div>
   )
 }
 
-function ManagementCard({ title, description, icon, actions }: {
+function ManagementCard({ title, description, icon, href, color, actions }: {
   title: string
   description: string
   icon: React.ReactNode
-  actions: Array<{ label: string; href: string; primary?: boolean }>
+  href: string
+  color: 'blue' | 'green' | 'pink' | 'purple' | 'orange' | 'teal' | 'indigo' | 'cyan'
+  actions: Array<{ label: string; href: string }>
 }) {
+  const colors = {
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    pink: 'bg-pink-500',
+    purple: 'bg-purple-500',
+    orange: 'bg-orange-500',
+    teal: 'bg-teal-500',
+    indigo: 'bg-indigo-500',
+    cyan: 'bg-cyan-500'
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-start space-x-4">
-        <div className="flex-shrink-0">
+    <Link
+      href={href}
+      className="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:border-pink-100 transition-all block"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className={`w-12 h-12 rounded-xl ${colors[color]} flex items-center justify-center text-white`}>
           {icon}
         </div>
-        <div className="flex-1">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-          <p className="mt-1 text-sm text-gray-600">{description}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {actions.map((action, index) => (
-              <Link
-                key={index}
-                href={action.href}
-                className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  action.primary
-                    ? 'bg-pink-600 text-white hover:bg-pink-700'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {action.label}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-all" />
       </div>
-    </div>
+      <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500">{description}</p>
+    </Link>
   )
 }
