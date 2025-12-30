@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Heart, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, Check } from 'lucide-react'
+import { Logo } from '@/components/Logo'
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -69,26 +70,60 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <Heart className="h-12 w-12 text-pink-500" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-gray-600">Start planning your perfect wedding website</p>
+    <div className="min-h-screen bg-white flex">
+      {/* Left side - decorative */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-violet-600 via-fuchsia-500 to-pink-500 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-10 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         </div>
+        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
+          <h1 className="text-4xl font-serif font-bold mb-6">Start Your Journey</h1>
+          <p className="text-white/80 text-lg leading-relaxed mb-8">
+            Create a beautiful wedding website in minutes. Share your love story with everyone who matters.
+          </p>
+          <div className="space-y-4">
+            {[
+              'Custom wedding website',
+              'RSVP management',
+              'Gift registry',
+              'Photo gallery'
+            ].map((feature, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                  <Check className="w-4 h-4" />
+                </div>
+                <span className="text-white/90">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Right side - form */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-12">
+        <div className="mx-auto w-full max-w-md">
+          <Link href="/" className="inline-block mb-8">
+            <Logo size="md" />
+          </Link>
+
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h2>
+          <p className="text-gray-600 mb-8">
+            Already have an account?{' '}
+            <Link href="/auth/signin" className="text-pink-600 hover:text-pink-500 font-medium">
+              Sign in
+            </Link>
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+              <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
               </label>
               <input
@@ -99,12 +134,13 @@ export default function SignUp() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-black bg-gray-50 focus:bg-white"
+                placeholder="John & Jane"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email address
               </label>
               <input
@@ -115,15 +151,16 @@ export default function SignUp() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-black bg-gray-50 focus:bg-white"
+                placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
-              <div className="relative mt-1">
+              <div className="relative">
                 <input
                   id="password"
                   name="password"
@@ -132,27 +169,28 @@ export default function SignUp() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 pr-10 text-black"
+                  className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent pr-12 transition-all text-black bg-gray-50 focus:bg-white"
+                  placeholder="At least 6 characters"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
               </label>
-              <div className="relative mt-1">
+              <div className="relative">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -161,17 +199,18 @@ export default function SignUp() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 pr-10 text-black"
+                  className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent pr-12 transition-all text-black bg-gray-50 focus:bg-white"
+                  placeholder="Confirm your password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
@@ -180,20 +219,25 @@ export default function SignUp() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-pink-500/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  Create account
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
-          </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link href="/auth/signin" className="font-medium text-pink-600 hover:text-pink-500">
-                Sign in here
-              </Link>
+            <p className="text-center text-xs text-gray-500">
+              By creating an account, you agree to our terms of service and privacy policy.
             </p>
-          </div>
+          </form>
         </div>
       </div>
     </div>
