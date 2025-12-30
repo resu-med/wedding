@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     // Create Stripe Checkout Session
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
+      customer_email: user.email, // Pre-fill email on checkout
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -79,7 +80,19 @@ export async function POST(request: NextRequest) {
       cancel_url: `${origin}/payment/cancelled`,
       metadata: {
         userId: user.id
-      }
+      },
+      // Send professional receipt email after payment
+      payment_intent_data: {
+        receipt_email: user.email,
+      },
+      // Generate invoice for the payment
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: 'Wedding Prepped - Wedding Website Package',
+          footer: 'Thank you for choosing Wedding Prepped!',
+        },
+      },
     })
 
     return NextResponse.json({ url: checkoutSession.url })
