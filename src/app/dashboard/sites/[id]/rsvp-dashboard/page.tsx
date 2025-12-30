@@ -19,8 +19,10 @@ import {
   MessageSquare,
   PartyPopper,
   Heart,
-  Bus
+  Bus,
+  ExternalLink
 } from 'lucide-react'
+import { Logo } from '@/components/Logo'
 
 interface RsvpStats {
   summary: {
@@ -84,6 +86,7 @@ interface RsvpStats {
 
 interface WeddingSite {
   id: string
+  subdomain: string
   partner1Name: string
   partner2Name: string
   weddingDate: string
@@ -215,8 +218,14 @@ export default function RSVPDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-pink-100 rounded-full mx-auto" />
+            <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin absolute top-0 left-1/2 -translate-x-1/2" />
+          </div>
+          <p className="text-gray-600 mt-4 font-medium">Loading RSVP data...</p>
+        </div>
       </div>
     )
   }
@@ -225,53 +234,67 @@ export default function RSVPDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-6">
+              <Link href="/" className="flex-shrink-0">
+                <Logo size="sm" />
+              </Link>
               <Link
                 href={`/dashboard/sites/${siteId}`}
-                className="flex items-center text-gray-500 hover:text-gray-700"
+                className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back to Site
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Back to Site</span>
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-3">
               <button
                 onClick={exportToCSV}
-                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                className="hidden sm:flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-green-600 transition-colors text-sm"
               >
                 <Download className="h-4 w-4" />
-                <span>Export CSV</span>
+                Export CSV
               </button>
-              <Link
-                href={`/dashboard/sites/${siteId}/guests`}
-                className="flex items-center space-x-2 bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors"
-              >
-                <Users className="h-4 w-4" />
-                <span>Manage Guests</span>
-              </Link>
+              {site && (
+                <a
+                  href={`https://${site.subdomain}.weddingprepped.com`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span className="hidden sm:inline">View Site</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {site && (
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              RSVP Dashboard
-            </h1>
-            <p className="text-gray-600">
-              {site.partner1Name} & {site.partner2Name}&apos;s Wedding
-            </p>
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900">RSVP Dashboard</h1>
+            {site && (
+              <p className="text-gray-600 mt-1">{site.partner1Name} & {site.partner2Name}&apos;s Wedding</p>
+            )}
           </div>
-        )}
+          <Link
+            href={`/dashboard/sites/${siteId}/guests`}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-violet-500 text-white px-4 py-2 rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/25 transition-all text-sm"
+          >
+            <Users className="h-4 w-4" />
+            Manage Guests
+          </Link>
+        </div>
 
         {/* RSVP Deadline Alert */}
         {daysUntilDeadline !== null && daysUntilDeadline <= 14 && (
-          <div className={`mb-6 p-4 rounded-lg ${daysUntilDeadline <= 3 ? 'bg-red-100 border border-red-300' : 'bg-yellow-100 border border-yellow-300'}`}>
+          <div className={`mb-6 p-4 rounded-2xl ${daysUntilDeadline <= 3 ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}>
             <div className="flex items-center">
               <Calendar className={`h-5 w-5 mr-2 ${daysUntilDeadline <= 3 ? 'text-red-600' : 'text-yellow-600'}`} />
               <span className={`font-medium ${daysUntilDeadline <= 3 ? 'text-red-800' : 'text-yellow-800'}`}>
@@ -287,7 +310,7 @@ export default function RSVPDashboard() {
           <>
             {/* Main Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <Users className="h-8 w-8 text-blue-500" />
                   <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Total</span>
@@ -296,7 +319,7 @@ export default function RSVPDashboard() {
                 <p className="text-sm text-gray-500 mt-1">Total Guests</p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <Check className="h-8 w-8 text-green-500" />
                   <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">Confirmed</span>
@@ -305,7 +328,7 @@ export default function RSVPDashboard() {
                 <p className="text-sm text-gray-500 mt-1">Attending</p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <X className="h-8 w-8 text-red-500" />
                 </div>
@@ -313,7 +336,7 @@ export default function RSVPDashboard() {
                 <p className="text-sm text-gray-500 mt-1">Not Attending</p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <Clock className="h-8 w-8 text-yellow-500" />
                 </div>
@@ -333,7 +356,7 @@ export default function RSVPDashboard() {
             {/* Response Rate & Event Breakdown */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Response Rate */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Response Rate</h3>
                   <TrendingUp className="h-5 w-5 text-gray-400" />
@@ -367,7 +390,7 @@ export default function RSVPDashboard() {
               </div>
 
               {/* Event Breakdown */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Event Attendance</h3>
                   <PartyPopper className="h-5 w-5 text-gray-400" />
@@ -435,7 +458,7 @@ export default function RSVPDashboard() {
             {/* Dietary Requirements & Category Breakdown */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Dietary Requirements */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Dietary Requirements</h3>
                   <Utensils className="h-5 w-5 text-gray-400" />
@@ -467,7 +490,7 @@ export default function RSVPDashboard() {
               </div>
 
               {/* Category Breakdown */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Guest Categories</h3>
                   <Users className="h-5 w-5 text-gray-400" />
@@ -500,7 +523,7 @@ export default function RSVPDashboard() {
             {/* Recent RSVPs & Special Requests */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Recent RSVPs */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Recent RSVPs</h3>
                   <Clock className="h-5 w-5 text-gray-400" />
@@ -532,7 +555,7 @@ export default function RSVPDashboard() {
               </div>
 
               {/* Special Requests */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Special Requests</h3>
                   <MessageSquare className="h-5 w-5 text-gray-400" />
