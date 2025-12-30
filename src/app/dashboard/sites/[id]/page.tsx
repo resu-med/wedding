@@ -18,7 +18,8 @@ import {
   Eye,
   BarChart3,
   Mail,
-  Globe
+  Globe,
+  Trash2
 } from 'lucide-react'
 
 interface WeddingSite {
@@ -66,6 +67,7 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [siteId, setSiteId] = useState<string>('')
+  const [clearing, setClearing] = useState<string | null>(null)
 
   useEffect(() => {
     const getParams = async () => {
@@ -122,6 +124,35 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
   const totalGiftAmount = completedGifts.reduce((sum, g) => sum + (Number(g.amount) || 0), 0)
   const giftCurrency = site?.giftCurrency || 'EUR'
   const currencySymbol = giftCurrency === 'EUR' ? '€' : giftCurrency === 'GBP' ? '£' : '$'
+
+  const clearData = async (type: 'rsvps' | 'gifts' | 'all') => {
+    const confirmMessage = type === 'all'
+      ? 'Are you sure you want to clear ALL RSVPs and gifts? This cannot be undone.'
+      : type === 'rsvps'
+      ? 'Are you sure you want to clear all RSVPs? Guest RSVP status will be reset to pending. This cannot be undone.'
+      : 'Are you sure you want to clear all gifts? This cannot be undone.'
+
+    if (!confirm(confirmMessage)) return
+
+    setClearing(type)
+    try {
+      const response = await fetch(`/api/wedding-sites/${siteId}/clear-data?type=${type}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        alert(`${type === 'all' ? 'All data' : type === 'rsvps' ? 'RSVP data' : 'Gift data'} cleared successfully!`)
+        fetchData() // Refresh the data
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to clear data')
+      }
+    } catch (error) {
+      alert('Failed to clear data')
+    } finally {
+      setClearing(null)
+    }
+  }
 
   if (loading) {
     return (
@@ -348,6 +379,42 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
               { label: "Domain Settings", href: `/dashboard/sites/${siteId}/domain`, primary: true }
             ]}
           />
+
+          {/* Data Management */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <Trash2 className="h-8 w-8 text-red-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-medium text-gray-900">Data Management</h3>
+                <p className="mt-1 text-sm text-gray-600">Clear RSVP responses or gift records. Useful for testing or starting fresh.</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => clearData('rsvps')}
+                    disabled={clearing !== null}
+                    className="px-3 py-2 rounded text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-50"
+                  >
+                    {clearing === 'rsvps' ? 'Clearing...' : 'Clear RSVPs'}
+                  </button>
+                  <button
+                    onClick={() => clearData('gifts')}
+                    disabled={clearing !== null}
+                    className="px-3 py-2 rounded text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-50"
+                  >
+                    {clearing === 'gifts' ? 'Clearing...' : 'Clear Gifts'}
+                  </button>
+                  <button
+                    onClick={() => clearData('all')}
+                    disabled={clearing !== null}
+                    className="px-3 py-2 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
+                  >
+                    {clearing === 'all' ? 'Clearing...' : 'Clear All Data'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
