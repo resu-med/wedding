@@ -61,7 +61,6 @@ export default function CreateWeddingSite() {
     partner1Name: '',
     partner2Name: '',
     partner1Email: '',
-    partner2Email: '',
     weddingDate: '',
     weddingTime: '',
     venueName: '',
@@ -358,29 +357,15 @@ export default function CreateWeddingSite() {
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label htmlFor="partner1Email" className="block text-sm font-medium text-gray-700">
-                  Partner 1 Email
+                  Email
                 </label>
                 <input
                   type="email"
                   id="partner1Email"
                   name="partner1Email"
                   value={formData.partner1Email}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="partner2Email" className="block text-sm font-medium text-gray-700">
-                  Partner 2 Email
-                </label>
-                <input
-                  type="email"
-                  id="partner2Email"
-                  name="partner2Email"
-                  value={formData.partner2Email}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
                 />
