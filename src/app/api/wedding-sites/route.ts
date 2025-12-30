@@ -109,14 +109,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if subdomain is already taken
+    // Check if subdomain is already taken and suggest alternatives
     const existingSubdomain = await prisma.weddingSite.findUnique({
       where: { subdomain: data.subdomain }
     })
 
     if (existingSubdomain) {
+      // Generate suggestions
+      const year = new Date(data.weddingDate).getFullYear()
+      const suggestions = [
+        `${data.subdomain}${year}`,
+        `${data.subdomain}wedding`,
+        `the${data.subdomain}`,
+        `${data.subdomain}2025`,
+      ]
       return NextResponse.json(
-        { error: 'This subdomain is already taken' },
+        {
+          error: `This URL is already taken. Try: ${suggestions[0]}, ${suggestions[1]}, or ${suggestions[2]}`,
+          suggestions
+        },
         { status: 400 }
       )
     }
