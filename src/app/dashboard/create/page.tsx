@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe, Search, CreditCard, AlertCircle } from 'lucide-react'
+import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe, Search, CreditCard, AlertCircle, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { generateSubdomain, isValidSubdomain, getCurrencyForCountry } from '@/lib/utils'
 
 export default function CreateWeddingSite() {
@@ -21,6 +21,8 @@ export default function CreateWeddingSite() {
   } | null>(null)
   const [processingPayment, setProcessingPayment] = useState(false)
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>([])
+  const [subdomainStatus, setSubdomainStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
+  const [checkingSubdomain, setCheckingSubdomain] = useState(false)
 
   useEffect(() => {
     async function checkAccess() {
@@ -38,6 +40,46 @@ export default function CreateWeddingSite() {
     }
     checkAccess()
   }, [])
+
+  // Check subdomain availability with debounce
+  useEffect(() => {
+    if (!formData.subdomain || formData.subdomain.length < 3) {
+      setSubdomainStatus('idle')
+      setSubdomainSuggestions([])
+      return
+    }
+
+    if (!isValidSubdomain(formData.subdomain)) {
+      setSubdomainStatus('idle')
+      return
+    }
+
+    setSubdomainStatus('checking')
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/wedding-sites/check-subdomain?subdomain=${formData.subdomain}`)
+        const data = await response.json()
+
+        if (data.available) {
+          setSubdomainStatus('available')
+          setSubdomainSuggestions([])
+        } else {
+          setSubdomainStatus('taken')
+          // Generate suggestions
+          const year = formData.weddingDate ? new Date(formData.weddingDate).getFullYear() : 2025
+          setSubdomainSuggestions([
+            `${formData.subdomain}${year}`,
+            `${formData.subdomain}wedding`,
+            `the${formData.subdomain}`,
+          ])
+        }
+      } catch (error) {
+        setSubdomainStatus('idle')
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [formData.subdomain, formData.weddingDate])
 
   const handlePayment = async () => {
     setProcessingPayment(true)
@@ -620,16 +662,70 @@ export default function CreateWeddingSite() {
                     required
                     value={formData.subdomain}
                     onChange={handleChange}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                    className={`block w-full px-3 py-2 border rounded-l-md focus:outline-none text-black ${
+                      subdomainStatus === 'available'
+                        ? 'border-green-500 focus:ring-green-500 focus:border-green-500'
+                        : subdomainStatus === 'taken'
+                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
+                    }`}
                     placeholder="your-names"
                   />
                   <span className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm rounded-r-md">
-                    .yourwedding.com
+                    .weddingprepped.com
                   </span>
+                  {subdomainStatus === 'checking' && (
+                    <span className="inline-flex items-center px-2">
+                      <Loader2 className="h-5 w-5 text-gray-400 animate-spin" />
+                    </span>
+                  )}
+                  {subdomainStatus === 'available' && (
+                    <span className="inline-flex items-center px-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    </span>
+                  )}
+                  {subdomainStatus === 'taken' && (
+                    <span className="inline-flex items-center px-2">
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    </span>
+                  )}
                 </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  This will be your wedding website URL that guests will visit
-                </p>
+
+                {subdomainStatus === 'available' && (
+                  <p className="mt-1 text-sm text-green-600 flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    This URL is available!
+                  </p>
+                )}
+
+                {subdomainStatus === 'taken' && (
+                  <div className="mt-2">
+                    <p className="text-sm text-red-600 flex items-center mb-2">
+                      <XCircle className="h-4 w-4 mr-1" />
+                      This URL is taken. Try one of these:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {subdomainSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, subdomain: suggestion }))
+                          }}
+                          className="px-3 py-1 bg-white border border-pink-300 text-pink-600 rounded-full text-sm hover:bg-pink-50 transition-colors"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {subdomainStatus === 'idle' && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    This will be your wedding website URL that guests will visit
+                  </p>
+                )}
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
