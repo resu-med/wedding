@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, Settings, ExternalLink, Calendar, Users, Gift, BarChart3 } from 'lucide-react'
+import { Plus, Settings, ExternalLink, Calendar, Users, Gift, BarChart3, LogOut } from 'lucide-react'
 
 interface WeddingSite {
   id: string
@@ -61,7 +61,7 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-gray-900">
               Welcome back, {session?.user?.name}
             </h1>
-            <div className="flex space-x-4">
+            <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard/create"
                 className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 flex items-center space-x-2"
@@ -69,6 +69,13 @@ export default function Dashboard() {
                 <Plus className="h-5 w-5" />
                 <span>Create Wedding Site</span>
               </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md hover:bg-gray-100 flex items-center space-x-2"
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         </div>

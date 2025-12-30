@@ -10,7 +10,7 @@ export default function Home() {
             <Heart className="h-16 w-16 text-pink-500" />
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Forever Weddings
+            Wedding Prepped
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Create beautiful, personalized wedding websites for your special day.

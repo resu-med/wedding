@@ -85,6 +85,10 @@ export async function GET(
     // Count plus ones
     const plusOnes = guests.filter(g => g.plusOneName && g.plusOneName.trim() !== '').length
 
+    // Count bus transfer needs
+    const needsBusToVenue = guests.filter(g => g.needsBusToVenue === true).length
+    const needsBusFromVenue = guests.filter(g => g.needsBusFromVenue === true).length
+
     // Aggregate dietary requirements
     const dietaryMap: Record<string, string[]> = {}
     guests.forEach(guest => {
@@ -144,7 +148,9 @@ export async function GET(
         maybe,
         responseRate: totalGuests > 0 ? Math.round(((attending + notAttending) / totalGuests) * 100) : 0,
         plusOnes,
-        totalAttending: attending + plusOnes
+        totalAttending: attending + plusOnes,
+        needsBusToVenue,
+        needsBusFromVenue
       },
       eventBreakdown: {
         ceremony: attendingCeremony,
@@ -174,6 +180,8 @@ export async function GET(
         attendingReception: g.attendingReception,
         dietaryRequests: g.dietaryRequests,
         specialRequests: g.specialRequests,
+        needsBusToVenue: g.needsBusToVenue,
+        needsBusFromVenue: g.needsBusFromVenue,
         plusOneName: g.plusOneName,
         createdAt: g.createdAt,
         updatedAt: g.updatedAt

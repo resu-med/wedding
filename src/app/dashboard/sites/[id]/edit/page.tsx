@@ -28,6 +28,22 @@ interface WeddingSite {
   partner2Email?: string
   weddingDate: string
   weddingTime?: string
+  // Ceremony details
+  ceremonyVenueName?: string
+  ceremonyVenueAddress?: string
+  ceremonyVenueCity?: string
+  ceremonyVenueState?: string
+  ceremonyVenueZip?: string
+  ceremonyTime?: string
+  // Reception details
+  receptionVenueName?: string
+  receptionVenueAddress?: string
+  receptionVenueCity?: string
+  receptionVenueState?: string
+  receptionVenueZip?: string
+  receptionTime?: string
+  receptionSameVenue?: boolean
+  // Legacy venue (default)
   venueName: string
   venueAddress: string
   venueCity: string
@@ -449,124 +465,327 @@ export default function EditWeddingDetails() {
             )}
 
             {activeTab === 'venue' && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Venue Information</h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Venue Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.venueName || ''}
-                      onChange={(e) => updateFormData('venueName', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    />
+              <div className="space-y-8">
+                {/* Ceremony Section */}
+                <div className="bg-pink-50 rounded-lg p-6 border border-pink-200">
+                  <div className="flex items-center mb-4">
+                    <Heart className="h-6 w-6 text-pink-500 mr-2" />
+                    <h3 className="text-lg font-medium text-gray-900">Ceremony Details</h3>
                   </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Address *
-                    </label>
-                    <div className="mt-1 flex rounded-md shadow-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Ceremony Venue Name
+                      </label>
                       <input
                         type="text"
-                        value={formData.venueAddress || ''}
-                        onChange={(e) => updateFormData('venueAddress', e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                        placeholder="Enter venue address"
+                        value={formData.ceremonyVenueName || formData.venueName || ''}
+                        onChange={(e) => updateFormData('ceremonyVenueName', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                        placeholder="e.g., St. Mary's Church"
                       />
-                      <button
-                        type="button"
-                        onClick={lookupVenueLocation}
-                        disabled={geocoding || !formData.venueAddress}
-                        className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Search className="h-4 w-4" />
-                        {geocoding ? 'Looking up...' : 'Lookup'}
-                      </button>
                     </div>
-                    {formData.venueLat && formData.venueLng && (
-                      <p className="mt-1 text-sm text-green-600">
-                        ✓ Location found: {formData.venueLat.toFixed(4)}, {formData.venueLng.toFixed(4)}
-                      </p>
-                    )}
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Ceremony Address
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.ceremonyVenueAddress || formData.venueAddress || ''}
+                        onChange={(e) => updateFormData('ceremonyVenueAddress', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                        placeholder="Street address"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.ceremonyVenueCity || formData.venueCity || ''}
+                        onChange={(e) => updateFormData('ceremonyVenueCity', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        State/Province
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.ceremonyVenueState || formData.venueState || ''}
+                        onChange={(e) => updateFormData('ceremonyVenueState', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        ZIP/Postal Code
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.ceremonyVenueZip || formData.venueZip || ''}
+                        onChange={(e) => updateFormData('ceremonyVenueZip', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Ceremony Time
+                      </label>
+                      <input
+                        type="time"
+                        value={formData.ceremonyTime || formData.weddingTime || ''}
+                        onChange={(e) => updateFormData('ceremonyTime', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reception Section */}
+                <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <Users className="h-6 w-6 text-purple-500 mr-2" />
+                      <h3 className="text-lg font-medium text-gray-900">Reception Details</h3>
+                    </div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.receptionSameVenue !== false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, receptionSameVenue: e.target.checked }))}
+                        className="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Same venue as ceremony</span>
+                    </label>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.venueCity || ''}
-                      onChange={(e) => updateFormData('venueCity', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    />
-                  </div>
+                  {formData.receptionSameVenue === false ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Reception Venue Name
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.receptionVenueName || ''}
+                          onChange={(e) => updateFormData('receptionVenueName', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                          placeholder="e.g., Grand Ballroom"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      State/Province *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.venueState || ''}
-                      onChange={(e) => updateFormData('venueState', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    />
-                  </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Reception Address
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.receptionVenueAddress || ''}
+                          onChange={(e) => updateFormData('receptionVenueAddress', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                          placeholder="Street address"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      ZIP/Postal Code
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.venueZip || ''}
-                      onChange={(e) => updateFormData('venueZip', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.receptionVenueCity || ''}
+                          onChange={(e) => updateFormData('receptionVenueCity', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Country *
-                    </label>
-                    <select
-                      value={formData.venueCountry || ''}
-                      onChange={(e) => updateFormData('venueCountry', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
-                    >
-                      <option value="">Select a country</option>
-                      <option value="Spain">Spain</option>
-                      <option value="United States">United States</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                      <option value="Canada">Canada</option>
-                      <option value="Australia">Australia</option>
-                      <option value="France">France</option>
-                      <option value="Germany">Germany</option>
-                      <option value="Italy">Italy</option>
-                      <option value="Portugal">Portugal</option>
-                      <option value="Mexico">Mexico</option>
-                      <option value="Ireland">Ireland</option>
-                      <option value="Netherlands">Netherlands</option>
-                      <option value="Belgium">Belgium</option>
-                      <option value="Switzerland">Switzerland</option>
-                      <option value="Austria">Austria</option>
-                      <option value="Greece">Greece</option>
-                      <option value="New Zealand">New Zealand</option>
-                      <option value="Brazil">Brazil</option>
-                      <option value="Argentina">Argentina</option>
-                      <option value="India">India</option>
-                      <option value="Japan">Japan</option>
-                      <option value="South Korea">South Korea</option>
-                      <option value="Singapore">Singapore</option>
-                      <option value="Thailand">Thailand</option>
-                      <option value="Philippines">Philippines</option>
-                      <option value="South Africa">South Africa</option>
-                    </select>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          State/Province
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.receptionVenueState || ''}
+                          onChange={(e) => updateFormData('receptionVenueState', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          ZIP/Postal Code
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.receptionVenueZip || ''}
+                          onChange={(e) => updateFormData('receptionVenueZip', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Reception Time
+                        </label>
+                        <input
+                          type="time"
+                          value={formData.receptionTime || ''}
+                          onChange={(e) => updateFormData('receptionTime', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Reception Time
+                        </label>
+                        <input
+                          type="time"
+                          value={formData.receptionTime || ''}
+                          onChange={(e) => updateFormData('receptionTime', e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
+                        />
+                        <p className="mt-1 text-sm text-gray-500">Leave blank to show "Following ceremony"</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Main Venue (for map/photos lookup) */}
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <div className="flex items-center mb-4">
+                    <MapPin className="h-6 w-6 text-gray-500 mr-2" />
+                    <h3 className="text-lg font-medium text-gray-900">Main Venue (for map & photos)</h3>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-4">This is used to show venue photos and the map on your site.</p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Venue Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.venueName || ''}
+                        onChange={(e) => updateFormData('venueName', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Address *
+                      </label>
+                      <div className="mt-1 flex rounded-md shadow-sm">
+                        <input
+                          type="text"
+                          value={formData.venueAddress || ''}
+                          onChange={(e) => updateFormData('venueAddress', e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                          placeholder="Enter venue address"
+                        />
+                        <button
+                          type="button"
+                          onClick={lookupVenueLocation}
+                          disabled={geocoding || !formData.venueAddress}
+                          className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Search className="h-4 w-4" />
+                          {geocoding ? 'Looking up...' : 'Lookup'}
+                        </button>
+                      </div>
+                      {formData.venueLat && formData.venueLng && (
+                        <p className="mt-1 text-sm text-green-600">
+                          Location found: {formData.venueLat.toFixed(4)}, {formData.venueLng.toFixed(4)}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.venueCity || ''}
+                        onChange={(e) => updateFormData('venueCity', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        State/Province *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.venueState || ''}
+                        onChange={(e) => updateFormData('venueState', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        ZIP/Postal Code
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.venueZip || ''}
+                        onChange={(e) => updateFormData('venueZip', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Country *
+                      </label>
+                      <select
+                        value={formData.venueCountry || ''}
+                        onChange={(e) => updateFormData('venueCountry', e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 text-black"
+                      >
+                        <option value="">Select a country</option>
+                        <option value="Spain">Spain</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="France">France</option>
+                        <option value="Germany">Germany</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Portugal">Portugal</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Ireland">Ireland</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Austria">Austria</option>
+                        <option value="Greece">Greece</option>
+                        <option value="New Zealand">New Zealand</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="India">India</option>
+                        <option value="Japan">Japan</option>
+                        <option value="South Korea">South Korea</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Thailand">Thailand</option>
+                        <option value="Philippines">Philippines</option>
+                        <option value="South Africa">South Africa</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>

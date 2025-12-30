@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe, Search } from 'lucide-react'
+import { Heart, ArrowLeft, Calendar, MapPin, Palette, Globe, Search, CreditCard, AlertCircle } from 'lucide-react'
 import { generateSubdomain, isValidSubdomain, getCurrencyForCountry } from '@/lib/utils'
 
 export default function CreateWeddingSite() {
@@ -13,6 +13,49 @@ export default function CreateWeddingSite() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [geocoding, setGeocoding] = useState(false)
+  const [checkingAccess, setCheckingAccess] = useState(true)
+  const [accessStatus, setAccessStatus] = useState<{
+    hasPaid: boolean
+    hasSite: boolean
+    siteId?: string
+  } | null>(null)
+  const [processingPayment, setProcessingPayment] = useState(false)
+
+  useEffect(() => {
+    async function checkAccess() {
+      try {
+        const response = await fetch('/api/user/access')
+        if (response.ok) {
+          const data = await response.json()
+          setAccessStatus(data)
+        }
+      } catch (error) {
+        console.error('Error checking access:', error)
+      } finally {
+        setCheckingAccess(false)
+      }
+    }
+    checkAccess()
+  }, [])
+
+  const handlePayment = async () => {
+    setProcessingPayment(true)
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+      })
+      const data = await response.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        setError(data.error || 'Failed to start checkout')
+        setProcessingPayment(false)
+      }
+    } catch (error) {
+      setError('Failed to start checkout')
+      setProcessingPayment(false)
+    }
+  }
 
   const [formData, setFormData] = useState({
     partner1Name: '',
@@ -129,6 +172,122 @@ export default function CreateWeddingSite() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show loading while checking access
+  if (checkingAccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking access...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show payment gate if user hasn't paid
+  if (accessStatus && !accessStatus.hasPaid) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="max-w-lg mx-auto text-center px-4">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <CreditCard className="h-16 w-16 text-pink-500 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Create Your Wedding Website
+            </h1>
+            <p className="text-gray-600 mb-6">
+              For just £79, get a beautiful, personalized wedding website with all the features you need.
+            </p>
+
+            <div className="text-left bg-gray-50 rounded-lg p-4 mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">What's included:</h3>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Beautiful, customizable wedding website
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span>
+                  RSVP management & guest tracking
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Gift registry & contributions
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Interactive venue maps
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Email notifications for RSVPs & gifts
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span>
+                  Unlimited access until your wedding day
+                </li>
+              </ul>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
+
+            <button
+              onClick={handlePayment}
+              disabled={processingPayment}
+              className="w-full bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors disabled:opacity-50"
+            >
+              {processingPayment ? 'Redirecting to checkout...' : 'Get Started for £79'}
+            </button>
+
+            <Link
+              href="/dashboard"
+              className="block mt-4 text-gray-500 hover:text-gray-700"
+            >
+              ← Back to Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show message if user already has a wedding site
+  if (accessStatus && accessStatus.hasSite) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="max-w-lg mx-auto text-center px-4">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <AlertCircle className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Site Limit Reached
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Your account already has a wedding site. Each account is limited to one wedding site.
+            </p>
+
+            <div className="space-y-3">
+              <Link
+                href={`/dashboard/sites/${accessStatus.siteId}`}
+                className="block w-full bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors"
+              >
+                Go to Your Wedding Site
+              </Link>
+              <Link
+                href="/dashboard"
+                className="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+              >
+                Back to Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -18,6 +18,22 @@ interface WeddingSite {
   partner2Email?: string
   weddingDate: string
   weddingTime?: string
+  // Ceremony details
+  ceremonyVenueName?: string
+  ceremonyVenueAddress?: string
+  ceremonyVenueCity?: string
+  ceremonyVenueState?: string
+  ceremonyVenueZip?: string
+  ceremonyTime?: string
+  // Reception details
+  receptionVenueName?: string
+  receptionVenueAddress?: string
+  receptionVenueCity?: string
+  receptionVenueState?: string
+  receptionVenueZip?: string
+  receptionTime?: string
+  receptionSameVenue?: boolean
+  // Legacy venue
   venueName: string
   venueAddress: string
   venueCity: string
@@ -159,14 +175,11 @@ export default function PublicWeddingSite() {
               {site.rsvpEnabled && (
                 <a href="#rsvp" className="text-gray-700 hover:text-gray-900 font-medium">RSVP</a>
               )}
-              {site.accommodationEnabled && (
-                <a href="#accommodation" className="text-gray-700 hover:text-gray-900 font-medium">Stay</a>
-              )}
-              {site.transportEnabled && (
-                <a href="#transport" className="text-gray-700 hover:text-gray-900 font-medium">Travel</a>
-              )}
               {site.giftsEnabled && (
                 <a href="#gifts" className="text-gray-700 hover:text-gray-900 font-medium">Gifts</a>
+              )}
+              {site.accommodationEnabled && (
+                <a href="#accommodation" className="text-gray-700 hover:text-gray-900 font-medium">Stay</a>
               )}
             </div>
           </div>
@@ -266,18 +279,20 @@ export default function PublicWeddingSite() {
                   <Calendar className="h-4 w-4 mr-2" />
                   {formatDate(weddingDate)}
                 </div>
-                {site.weddingTime && (
+                {(site.ceremonyTime || site.weddingTime) && (
                   <div className="flex items-center justify-center">
                     <Clock className="h-4 w-4 mr-2" />
-                    {formatTime(site.weddingTime)}
+                    {formatTime(site.ceremonyTime || site.weddingTime || '')}
                   </div>
                 )}
                 <div className="flex items-center justify-center">
                   <MapPin className="h-4 w-4 mr-2" />
                   <div>
-                    <div>{site.venueName}</div>
-                    <div className="text-sm">{site.venueAddress}</div>
-                    <div className="text-sm">{site.venueCity}, {site.venueState} {site.venueZip}</div>
+                    <div>{site.ceremonyVenueName || site.venueName}</div>
+                    <div className="text-sm">{site.ceremonyVenueAddress || site.venueAddress}</div>
+                    <div className="text-sm">
+                      {site.ceremonyVenueCity || site.venueCity}, {site.ceremonyVenueState || site.venueState} {site.ceremonyVenueZip || site.venueZip}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -294,14 +309,28 @@ export default function PublicWeddingSite() {
                 </div>
                 <div className="flex items-center justify-center">
                   <Clock className="h-4 w-4 mr-2" />
-                  Following ceremony
+                  {site.receptionTime ? formatTime(site.receptionTime) : 'Following ceremony'}
                 </div>
                 <div className="flex items-center justify-center">
                   <MapPin className="h-4 w-4 mr-2" />
                   <div>
-                    <div>{site.venueName}</div>
-                    <div className="text-sm">{site.venueAddress}</div>
-                    <div className="text-sm">{site.venueCity}, {site.venueState} {site.venueZip}</div>
+                    {site.receptionSameVenue === false && site.receptionVenueName ? (
+                      <>
+                        <div>{site.receptionVenueName}</div>
+                        <div className="text-sm">{site.receptionVenueAddress}</div>
+                        <div className="text-sm">
+                          {site.receptionVenueCity}, {site.receptionVenueState} {site.receptionVenueZip}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>{site.ceremonyVenueName || site.venueName}</div>
+                        <div className="text-sm">{site.ceremonyVenueAddress || site.venueAddress}</div>
+                        <div className="text-sm">
+                          {site.ceremonyVenueCity || site.venueCity}, {site.ceremonyVenueState || site.venueState} {site.ceremonyVenueZip || site.venueZip}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -358,6 +387,28 @@ export default function PublicWeddingSite() {
               <p className="text-sm text-gray-600 mt-4">
                 Click to submit your response
               </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Gifts Section */}
+      {site.giftsEnabled && (
+        <section id="gifts" className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Wedding Gifts</h2>
+            <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+              <Gift className="h-12 w-12 mx-auto mb-4" style={{ color: site.primaryColor }} />
+              <p className="text-gray-700 mb-6">
+                Your presence is the only present we need, but if you&apos;d like to contribute to our future together, we&apos;d be grateful.
+              </p>
+              <button
+                className="w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors mb-3"
+                style={{ backgroundColor: site.primaryColor }}
+                onClick={() => setShowGiftModal(true)}
+              >
+                Send a Gift
+              </button>
             </div>
           </div>
         </section>
@@ -471,42 +522,6 @@ export default function PublicWeddingSite() {
                 })}
               </div>
             )}
-          </div>
-        </section>
-      )}
-
-      {/* Transport Section */}
-      {site.transportEnabled && site.transportInfo && (
-        <section id="transport" className="py-16 bg-white/50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Travel Information</h2>
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="prose prose-lg mx-auto text-gray-700">
-                <p className="whitespace-pre-line">{site.transportInfo}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Gifts Section */}
-      {site.giftsEnabled && (
-        <section id="gifts" className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Wedding Gifts</h2>
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
-              <Gift className="h-12 w-12 mx-auto mb-4" style={{ color: site.primaryColor }} />
-              <p className="text-gray-700 mb-6">
-                Your presence is the only present we need, but if you&apos;d like to contribute to our future together, we&apos;d be grateful.
-              </p>
-              <button
-                className="w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors mb-3"
-                style={{ backgroundColor: site.primaryColor }}
-                onClick={() => setShowGiftModal(true)}
-              >
-                Send a Gift
-              </button>
-            </div>
           </div>
         </section>
       )}

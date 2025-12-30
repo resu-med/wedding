@@ -53,13 +53,34 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: session.user.email },
+      include: {
+        weddingSites: {
+          select: { id: true }
+        }
+      }
     })
 
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
+      )
+    }
+
+    // Check if user has paid
+    if (!user.hasPaid) {
+      return NextResponse.json(
+        { error: 'Payment required to create a wedding site' },
+        { status: 402 }
+      )
+    }
+
+    // Check if user already has a wedding site (limit 1 per account)
+    if (user.weddingSites.length > 0) {
+      return NextResponse.json(
+        { error: 'You already have a wedding site. Each account is limited to one site.' },
+        { status: 400 }
       )
     }
 

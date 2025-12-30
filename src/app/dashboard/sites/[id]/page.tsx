@@ -37,12 +37,32 @@ interface WeddingSite {
   welcomeMessage?: string
   aboutUsStory?: string
   createdAt: string
+  giftCurrency?: string
+}
+
+interface RsvpStats {
+  summary: {
+    totalGuests: number
+    attending: number
+    notAttending: number
+    pending: number
+    responseRate: number
+  }
+}
+
+interface Gift {
+  id: string
+  amount: number | null
+  paymentStatus: string
+  giftCurrency?: string
 }
 
 export default function WeddingSiteManagement({ params }: { params: Promise<{ id: string }> }) {
   const { data: session } = useSession()
   const router = useRouter()
   const [site, setSite] = useState<WeddingSite | null>(null)
+  const [rsvpStats, setRsvpStats] = useState<RsvpStats | null>(null)
+  const [gifts, setGifts] = useState<Gift[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [siteId, setSiteId] = useState<string>('')
@@ -63,17 +83,32 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
       return
     }
 
-    fetchSite()
+    fetchData()
   }, [session, siteId, router])
 
-  const fetchSite = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch(`/api/wedding-sites/${siteId}`)
-      if (response.ok) {
-        const siteData = await response.json()
+      const [siteResponse, statsResponse, giftsResponse] = await Promise.all([
+        fetch(`/api/wedding-sites/${siteId}`),
+        fetch(`/api/wedding-sites/${siteId}/rsvp-stats`),
+        fetch(`/api/wedding-sites/${siteId}/gifts`)
+      ])
+
+      if (siteResponse.ok) {
+        const siteData = await siteResponse.json()
         setSite(siteData)
       } else {
         setError('Wedding site not found')
+      }
+
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json()
+        setRsvpStats(statsData)
+      }
+
+      if (giftsResponse.ok) {
+        const giftsData = await giftsResponse.json()
+        setGifts(giftsData)
       }
     } catch (error) {
       setError('Error loading wedding site')
@@ -81,6 +116,12 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
       setLoading(false)
     }
   }
+
+  // Calculate gift totals
+  const completedGifts = gifts.filter(g => g.paymentStatus === 'COMPLETED')
+  const totalGiftAmount = completedGifts.reduce((sum, g) => sum + (Number(g.amount) || 0), 0)
+  const giftCurrency = site?.giftCurrency || 'EUR'
+  const currencySymbol = giftCurrency === 'EUR' ? '€' : giftCurrency === 'GBP' ? '£' : '$'
 
   if (loading) {
     return (
@@ -183,29 +224,31 @@ export default function WeddingSiteManagement({ params }: { params: Promise<{ id
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total RSVPs"
-            value="0"
-            subtitle="out of 0 invited"
+            value={rsvpStats ? `${rsvpStats.summary.attending + rsvpStats.summary.notAttending}` : '0'}
+            subtitle={rsvpStats ? `out of ${rsvpStats.summary.totalGuests} invited` : 'out of 0 invited'}
             icon={<Users className="h-6 w-6 text-blue-500" />}
             color="blue"
           />
           <StatCard
             title="Gifts Received"
-            value="$0"
-            subtitle="0 gifts"
+            value={`${currencySymbol}${totalGiftAmount.toFixed(0)}`}
+            subtitle={`${completedGifts.length} gift${completedGifts.length !== 1 ? 's' : ''}`}
             icon={<Gift className="h-6 w-6 text-green-500" />}
             color="green"
           />
           <StatCard
-            title="Site Views"
-            value="0"
-            subtitle="this month"
+            title="Attending"
+            value={rsvpStats ? `${rsvpStats.summary.attending}` : '0'}
+            subtitle={rsvpStats && rsvpStats.summary.totalGuests > 0
+              ? `${Math.round((rsvpStats.summary.attending / rsvpStats.summary.totalGuests) * 100)}% of guests`
+              : '0% of guests'}
             icon={<Eye className="h-6 w-6 text-purple-500" />}
             color="purple"
           />
           <StatCard
-            title="Messages"
-            value="0"
-            subtitle="from guests"
+            title="Awaiting Response"
+            value={rsvpStats ? `${rsvpStats.summary.pending}` : '0'}
+            subtitle="pending RSVPs"
             icon={<MessageCircle className="h-6 w-6 text-orange-500" />}
             color="orange"
           />

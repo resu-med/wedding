@@ -18,6 +18,13 @@ model User {
   email         String    @unique
   name          String?
   password      String
+
+  // Stripe payment info
+  stripeCustomerId    String?   @unique
+  hasPaid             Boolean   @default(false)
+  paymentDate         DateTime?
+  stripePaymentId     String?
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -39,7 +46,24 @@ model WeddingSite {
   weddingDate       DateTime
   weddingTime       String?
 
-  // Venue Information
+  // Ceremony Information
+  ceremonyVenueName     String?
+  ceremonyVenueAddress  String?
+  ceremonyVenueCity     String?
+  ceremonyVenueState    String?
+  ceremonyVenueZip      String?
+  ceremonyTime          String?
+
+  // Reception Information
+  receptionVenueName    String?
+  receptionVenueAddress String?
+  receptionVenueCity    String?
+  receptionVenueState   String?
+  receptionVenueZip     String?
+  receptionTime         String?
+  receptionSameVenue    Boolean   @default(true)
+
+  // Venue Information (legacy/default)
   venueName         String
   venueAddress      String
   venueCity         String
@@ -123,6 +147,10 @@ model Guest {
   plusOneAllowed  Boolean   @default(false)
   plusOneName     String?
 
+  // Transport
+  needsBusToVenue     Boolean?
+  needsBusFromVenue   Boolean?
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -143,6 +171,8 @@ model Rsvp {
   plusOneName       String?
   plusOneEmail      String?
   message           String?
+  needsBusToVenue   Boolean?
+  needsBusFromVenue Boolean?
   submittedAt       DateTime  @default(now())
 
   guestId           String

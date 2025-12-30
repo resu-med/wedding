@@ -18,7 +18,8 @@ import {
   UserPlus,
   MessageSquare,
   PartyPopper,
-  Heart
+  Heart,
+  Bus
 } from 'lucide-react'
 
 interface RsvpStats {
@@ -31,6 +32,8 @@ interface RsvpStats {
     responseRate: number
     plusOnes: number
     totalAttending: number
+    needsBusToVenue: number
+    needsBusFromVenue: number
   }
   eventBreakdown: {
     ceremony: number
@@ -71,6 +74,8 @@ interface RsvpStats {
     attendingReception: boolean | null
     dietaryRequests: string | null
     specialRequests: string | null
+    needsBusToVenue: boolean | null
+    needsBusFromVenue: boolean | null
     plusOneName: string | null
     createdAt: string
     updatedAt: string
@@ -146,6 +151,8 @@ export default function RSVPDashboard() {
       'RSVP Status',
       'Attending Ceremony',
       'Attending Reception',
+      'Bus To Venue',
+      'Bus From Venue',
       'Dietary Requirements',
       'Special Requests',
       'Plus One Name'
@@ -159,6 +166,8 @@ export default function RSVPDashboard() {
       guest.rsvpStatus,
       guest.attendingCeremony ? 'Yes' : 'No',
       guest.attendingReception ? 'Yes' : 'No',
+      guest.needsBusToVenue ? 'Yes' : 'No',
+      guest.needsBusFromVenue ? 'Yes' : 'No',
       guest.dietaryRequests || '',
       guest.specialRequests || '',
       guest.plusOneName || ''
@@ -400,6 +409,26 @@ export default function RSVPDashboard() {
                     <strong className="text-gray-900">{stats.summary.totalAttending}</strong> total guests expected (including plus ones)
                   </p>
                 </div>
+
+                {/* Bus Transfer */}
+                {(stats.summary.needsBusToVenue > 0 || stats.summary.needsBusFromVenue > 0) && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                    <div className="flex items-center mb-2">
+                      <Bus className="h-5 w-5 text-blue-600 mr-2" />
+                      <span className="font-medium text-blue-900">Bus Transfer</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-blue-700">To venue:</span>
+                        <span className="font-bold text-blue-900 ml-2">{stats.summary.needsBusToVenue}</span>
+                      </div>
+                      <div>
+                        <span className="text-blue-700">From venue:</span>
+                        <span className="font-bold text-blue-900 ml-2">{stats.summary.needsBusFromVenue}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

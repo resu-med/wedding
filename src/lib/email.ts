@@ -28,7 +28,7 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
 
   try {
     const { data, error } = await client.emails.send({
-      from: 'Wedding Notifications <notifications@resend.dev>',
+      from: 'Wedding Notifications <notifications@resu-med.com>',
       to,
       subject,
       html,
@@ -49,11 +49,14 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
 export function formatRSVPEmail({
   guestName,
   guestEmail,
+  guestPhone,
   rsvpStatus,
   attendingCeremony,
   attendingReception,
   dietaryRequests,
   specialRequests,
+  needsBusToVenue,
+  needsBusFromVenue,
   plusOneName,
   message,
   partner1Name,
@@ -62,11 +65,14 @@ export function formatRSVPEmail({
 }: {
   guestName: string
   guestEmail: string
+  guestPhone?: string | null
   rsvpStatus: string
   attendingCeremony: boolean
   attendingReception: boolean
   dietaryRequests?: string | null
   specialRequests?: string | null
+  needsBusToVenue?: boolean
+  needsBusFromVenue?: boolean
   plusOneName?: string | null
   message?: string | null
   partner1Name: string
@@ -111,6 +117,12 @@ export function formatRSVPEmail({
                 <td style="padding: 8px 0; color: #6b7280;">Email:</td>
                 <td style="padding: 8px 0; color: #111827;">${guestEmail}</td>
               </tr>
+              ${guestPhone ? `
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Phone:</td>
+                <td style="padding: 8px 0; color: #111827;">${guestPhone}</td>
+              </tr>
+              ` : ''}
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Status:</td>
                 <td style="padding: 8px 0;">
@@ -128,6 +140,12 @@ export function formatRSVPEmail({
                 <td style="padding: 8px 0; color: #6b7280;">Reception:</td>
                 <td style="padding: 8px 0; color: #111827;">${attendingReception ? 'Yes' : 'No'}</td>
               </tr>
+              ${needsBusToVenue || needsBusFromVenue ? `
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Bus Transfer:</td>
+                <td style="padding: 8px 0; color: #111827;">${[needsBusToVenue ? 'To venue' : '', needsBusFromVenue ? 'From venue' : ''].filter(Boolean).join(', ')}</td>
+              </tr>
+              ` : ''}
               ` : ''}
               ${plusOneName ? `
               <tr>

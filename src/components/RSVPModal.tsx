@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Heart, Users, Check, Plus, Minus, User } from 'lucide-react'
+import { X, Heart, Users, Check, Plus, Minus, User, Bus } from 'lucide-react'
 
 interface RSVPModalProps {
   isOpen: boolean
@@ -36,6 +36,8 @@ export default function RSVPModal({
     rsvpStatus: '',
     attendingCeremony: true,
     attendingReception: true,
+    needsBusToVenue: false,
+    needsBusFromVenue: false,
     specialRequests: '',
     message: ''
   })
@@ -93,6 +95,8 @@ export default function RSVPModal({
           rsvpStatus: formData.rsvpStatus,
           attendingCeremony: formData.attendingCeremony,
           attendingReception: formData.attendingReception,
+          needsBusToVenue: formData.needsBusToVenue,
+          needsBusFromVenue: formData.needsBusFromVenue,
           specialRequests: formData.specialRequests,
           message: formData.message,
           siteId
@@ -475,38 +479,78 @@ export default function RSVPModal({
               </div>
 
               {formData.rsvpStatus === 'ATTENDING' && (
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700">Which events will you attend?</p>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="attendingCeremony"
-                      name="attendingCeremony"
-                      checked={formData.attendingCeremony}
-                      onChange={handleChange}
-                      className="h-4 w-4 rounded"
-                      style={{ accentColor: primaryColor }}
-                    />
-                    <label htmlFor="attendingCeremony" className="ml-3 text-gray-700">
-                      Ceremony
-                    </label>
+                <>
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">Which events will you attend?</p>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="attendingCeremony"
+                        name="attendingCeremony"
+                        checked={formData.attendingCeremony}
+                        onChange={handleChange}
+                        className="h-4 w-4 rounded"
+                        style={{ accentColor: primaryColor }}
+                      />
+                      <label htmlFor="attendingCeremony" className="ml-3 text-gray-700">
+                        Ceremony
+                      </label>
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="attendingReception"
+                        name="attendingReception"
+                        checked={formData.attendingReception}
+                        onChange={handleChange}
+                        className="h-4 w-4 rounded"
+                        style={{ accentColor: primaryColor }}
+                      />
+                      <label htmlFor="attendingReception" className="ml-3 text-gray-700">
+                        Reception
+                      </label>
+                    </div>
                   </div>
 
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="attendingReception"
-                      name="attendingReception"
-                      checked={formData.attendingReception}
-                      onChange={handleChange}
-                      className="h-4 w-4 rounded"
-                      style={{ accentColor: primaryColor }}
-                    />
-                    <label htmlFor="attendingReception" className="ml-3 text-gray-700">
-                      Reception
-                    </label>
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Bus className="h-5 w-5" style={{ color: primaryColor }} />
+                      <p className="text-sm font-medium text-gray-700">Bus Transfer</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">Do you need bus transport to or from the venue?</p>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="needsBusToVenue"
+                        name="needsBusToVenue"
+                        checked={formData.needsBusToVenue}
+                        onChange={handleChange}
+                        className="h-4 w-4 rounded"
+                        style={{ accentColor: primaryColor }}
+                      />
+                      <label htmlFor="needsBusToVenue" className="ml-3 text-gray-700">
+                        Bus to venue
+                      </label>
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="needsBusFromVenue"
+                        name="needsBusFromVenue"
+                        checked={formData.needsBusFromVenue}
+                        onChange={handleChange}
+                        className="h-4 w-4 rounded"
+                        style={{ accentColor: primaryColor }}
+                      />
+                      <label htmlFor="needsBusFromVenue" className="ml-3 text-gray-700">
+                        Bus from venue
+                      </label>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               <div className="flex justify-between pt-4">

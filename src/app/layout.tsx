@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Forever Weddings - Beautiful Wedding Websites",
+  title: "Wedding Prepped - Beautiful Wedding Websites",
   description: "Create beautiful, personalized wedding websites with RSVP management, gift registry, and more.",
 };
 

@@ -114,6 +114,22 @@ export async function PUT(
         partner2Email: data.partner2Email || weddingSite.partner2Email,
         weddingDate: data.weddingDate ? new Date(data.weddingDate) : weddingSite.weddingDate,
         weddingTime: data.weddingTime !== undefined ? data.weddingTime : weddingSite.weddingTime,
+        // Ceremony details
+        ceremonyVenueName: data.ceremonyVenueName !== undefined ? data.ceremonyVenueName : weddingSite.ceremonyVenueName,
+        ceremonyVenueAddress: data.ceremonyVenueAddress !== undefined ? data.ceremonyVenueAddress : weddingSite.ceremonyVenueAddress,
+        ceremonyVenueCity: data.ceremonyVenueCity !== undefined ? data.ceremonyVenueCity : weddingSite.ceremonyVenueCity,
+        ceremonyVenueState: data.ceremonyVenueState !== undefined ? data.ceremonyVenueState : weddingSite.ceremonyVenueState,
+        ceremonyVenueZip: data.ceremonyVenueZip !== undefined ? data.ceremonyVenueZip : weddingSite.ceremonyVenueZip,
+        ceremonyTime: data.ceremonyTime !== undefined ? data.ceremonyTime : weddingSite.ceremonyTime,
+        // Reception details
+        receptionVenueName: data.receptionVenueName !== undefined ? data.receptionVenueName : weddingSite.receptionVenueName,
+        receptionVenueAddress: data.receptionVenueAddress !== undefined ? data.receptionVenueAddress : weddingSite.receptionVenueAddress,
+        receptionVenueCity: data.receptionVenueCity !== undefined ? data.receptionVenueCity : weddingSite.receptionVenueCity,
+        receptionVenueState: data.receptionVenueState !== undefined ? data.receptionVenueState : weddingSite.receptionVenueState,
+        receptionVenueZip: data.receptionVenueZip !== undefined ? data.receptionVenueZip : weddingSite.receptionVenueZip,
+        receptionTime: data.receptionTime !== undefined ? data.receptionTime : weddingSite.receptionTime,
+        receptionSameVenue: data.receptionSameVenue !== undefined ? data.receptionSameVenue : weddingSite.receptionSameVenue,
+        // Legacy venue
         venueName: data.venueName || weddingSite.venueName,
         venueAddress: data.venueAddress || weddingSite.venueAddress,
         venueCity: data.venueCity || weddingSite.venueCity,

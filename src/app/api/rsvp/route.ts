@@ -91,6 +91,8 @@ export async function POST(request: NextRequest) {
             attendingReception: data.attendingReception,
             dietaryRequests: guestData.dietaryRequests || null,
             specialRequests: isMain ? (data.specialRequests || null) : null,
+            needsBusToVenue: data.needsBusToVenue || false,
+            needsBusFromVenue: data.needsBusFromVenue || false,
             isMainGuest: isMain,
             inviteGroup: groupId,
             weddingSiteId: data.siteId
@@ -108,6 +110,8 @@ export async function POST(request: NextRequest) {
             attendingReception: data.attendingReception,
             dietaryRequests: guestData.dietaryRequests || guest.dietaryRequests,
             specialRequests: data.specialRequests || guest.specialRequests,
+            needsBusToVenue: data.needsBusToVenue || false,
+            needsBusFromVenue: data.needsBusFromVenue || false,
             inviteGroup: groupId
           }
         })
@@ -124,6 +128,8 @@ export async function POST(request: NextRequest) {
           dietaryRequests: guestData.dietaryRequests || null,
           specialRequests: isMain ? (data.specialRequests || null) : null,
           message: isMain ? (data.message || null) : null,
+          needsBusToVenue: data.needsBusToVenue || false,
+          needsBusFromVenue: data.needsBusFromVenue || false,
           guestId: guest.id,
           weddingSiteId: data.siteId
         }
@@ -143,11 +149,14 @@ export async function POST(request: NextRequest) {
       const emailHtml = formatRSVPEmail({
         guestName: guestNames,
         guestEmail: data.email,
+        guestPhone: data.phone || undefined,
         rsvpStatus: data.rsvpStatus,
         attendingCeremony: data.attendingCeremony || false,
         attendingReception: data.attendingReception || false,
         dietaryRequests: dietaryList || undefined,
         specialRequests: data.specialRequests,
+        needsBusToVenue: data.needsBusToVenue || false,
+        needsBusFromVenue: data.needsBusFromVenue || false,
         message: data.message,
         partner1Name: weddingSite.partner1Name,
         partner2Name: weddingSite.partner2Name,
